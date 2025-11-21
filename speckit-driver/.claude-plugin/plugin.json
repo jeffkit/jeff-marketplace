@@ -1,0 +1,31 @@
+{
+  "name": "speckit-driver",
+  "version": "1.1.1",
+  "description": "Autonomous Spec-Driven Development orchestrator for Claude Code. Enables Claude to intelligently drive the entire speckit workflow (constitution → specify → clarify → checklist → plan → tasks → analyze → implement) with minimal user intervention, using sub-agents for execution while the main agent acts as project manager. Enhanced with 3 quality gates and 4-layer task marking protection.",
+  "author": {
+    "name": "jeffkit",
+    "email": "bbmyth@gmail.com",
+    "url": "https://github.com/jeffkit"
+  },
+  "homepage": "https://github.com/jeffkit/speckit-driver#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeffkit/speckit-driver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jeffkit/speckit-driver/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "speckit",
+    "spec-driven-development",
+    "autonomous",
+    "claude-code",
+    "plugin",
+    "orchestrator",
+    "quality-gates",
+    "sub-agents"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/"
+}

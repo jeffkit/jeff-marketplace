@@ -1,0 +1,100 @@
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+*.so
+*.egg
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Dependency Management
+pip-wheel-metadata/
+local_wheels/
+pip-selfcheck.json
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.log
+local_settings.py
+*.mo
+*.pot
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Frontend dependencies
+node_modules/
+jspm_packages/
+
+# Frontend build artifacts
+dist/
+build/
+.tmp/
+.sass-cache/
+/public/assets
+
+# Frontend logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE & Editor configs
+.idea/
+.vscode/
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+# Linux
+.directory
+
+# General
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Secrets
+*.pem
+*.key
+credentials.json
+
+# Assistant plugin data
+.assistant/

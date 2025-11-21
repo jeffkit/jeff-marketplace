@@ -1,0 +1,23 @@
+{
+    "name": "jeff-choices",
+    "owner": {
+        "name": "jeff kit",
+        "email": "bbmyth@gmail.com"
+    },
+    "description": "A collection of plugins for Jeff's workflow",
+    "plugins": [
+        {
+            "name": "assistant",
+            "source": "./assistant",
+            "description": "Personal assistant for managing TODOs and journal entries, supporting task tracking, activity logging, and smart querying through natural conversation.",
+            "author": {
+                "name": "jeff kit"
+            }
+        },
+        {
+            "name": "speckit-driver",
+            "source": "./speckit-driver",
+            "description": "Autonomous Spec-Driven Development orchestrator that enables intelligent, continuous workflow execution (constitution -> specify -> plan -> tasks -> implement) with minimal user intervention."
+        }
+    ]
+}

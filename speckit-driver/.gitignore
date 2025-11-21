@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+.temp/
+
+# Claude Code specific
+.claude/
+
+# Node modules (if any dev dependencies added later)
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local

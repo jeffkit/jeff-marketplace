@@ -1,0 +1,11 @@
+{
+    "name": "assistant",
+    "version": "2.1.0",
+    "description": "Personal assistant for managing TODOs and journal entries, supporting task tracking, activity logging, and smart querying through natural conversation.",
+    "author": {
+        "name": "jeff kit",
+        "email": "bbmyth@gmail.com"
+    },
+    "license": "MIT",
+    "skills": "./skills/"
+}
