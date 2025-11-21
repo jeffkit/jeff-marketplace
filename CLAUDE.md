@@ -237,10 +237,20 @@ Plugins are independent and do not share code or data. Changes to one plugin sho
   "priority": "high|medium|low",
   "status": "pending|in_progress|completed|cancelled",
   "due_date": "YYYY-MM-DD (optional)",
+  "project": "string (optional)",
+  "assignee": "string (optional)",
+  "tags": ["string"] (optional),
+  "description": "string (optional)",
   "created_at": "ISO 8601 timestamp",
   "updated_at": "ISO 8601 timestamp"
 }
 ```
+
+**New Fields (v2.2.0)**:
+- `project`: Project name/ID for grouping tasks
+- `assignee`: Person assigned to the task
+- `tags`: Array of flexible labels for multi-dimensional categorization
+- `description`: Detailed task description or requirements
 
 ### Journal Entry Schema
 ```json
@@ -252,6 +262,49 @@ Plugins are independent and do not share code or data. Changes to one plugin sho
   "tags": ["string"],
   "timestamp": "ISO 8601 timestamp"
 }
+```
+
+## CLI Usage Examples
+
+### Basic TODO Operations
+```bash
+# Add simple TODO (backward compatible)
+python3 scripts/todo_manager.py add "完成项目报告"
+
+# Add TODO with new fields
+python3 scripts/todo_manager.py add "实现用户认证" \
+  --category work --priority high \
+  --project jeff-marketplace \
+  --assignee jeff \
+  --tags backend,security,auth \
+  --description "添加JWT登录和用户注册功能"
+
+# List all TODOs
+python3 scripts/todo_manager.py list
+
+# Filter by project
+python3 scripts/todo_manager.py list --project jeff-marketplace
+
+# Filter by assignee and tags
+python3 scripts/todo_manager.py list --assignee jeff --tags backend
+
+# Filter by status and category
+python3 scripts/todo_manager.py list --status pending --category work
+
+# Update TODO
+python3 scripts/todo_manager.py update 1 --status in_progress --tags backend,security,auth,urgent
+```
+
+### Advanced Querying
+```bash
+# Find all backend tasks for jeff
+python3 scripts/todo_manager.py list --assignee jeff --tags backend
+
+# Find all high-priority work tasks
+python3 scripts/todo_manager.py list --category work --priority high
+
+# Find all tasks in a project
+python3 scripts/todo_manager.py list --project my-project
 ```
 
 ## Common Tasks

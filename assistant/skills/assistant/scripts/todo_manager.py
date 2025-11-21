@@ -44,16 +44,29 @@ class TodoManager:
         with open(self.data_file, 'w', encoding='utf-8') as f:
             json.dump(self.todos, f, ensure_ascii=False, indent=2)
 
+    def _get_next_id(self) -> int:
+        """Get next available ID safely"""
+        valid_todos = [t for t in self.todos if isinstance(t, dict)]
+        if not valid_todos:
+            return 1
+        return max(todo.get("id", 0) for todo in valid_todos) + 1
+
     def add_todo(self, title: str, category: str = "general",
-                 priority: str = "medium", due_date: Optional[str] = None) -> Dict:
+                 priority: str = "medium", due_date: Optional[str] = None,
+                 project: Optional[str] = None, assignee: Optional[str] = None,
+                 tags: Optional[List[str]] = None, description: Optional[str] = None) -> Dict:
         """Add a new TODO item"""
         todo = {
-            "id": len(self.todos) + 1,
+            "id": self._get_next_id(),
             "title": title,
             "category": category,
             "priority": priority,
             "status": "pending",
             "due_date": due_date,
+            "project": project,
+            "assignee": assignee,
+            "tags": tags or [],
+            "description": description,
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat()
         }
@@ -63,7 +76,10 @@ class TodoManager:
 
     def list_todos(self, category: Optional[str] = None,
                    status: Optional[str] = None,
-                   priority: Optional[str] = None) -> List[Dict]:
+                   priority: Optional[str] = None,
+                   project: Optional[str] = None,
+                   assignee: Optional[str] = None,
+                   tags: Optional[List[str]] = None) -> List[Dict]:
         """List todos with optional filters"""
         # Filter out any non-dict items that might have corrupted the data
         result = [t for t in self.todos if isinstance(t, dict)]
@@ -76,6 +92,17 @@ class TodoManager:
 
         if priority:
             result = [t for t in result if t.get("priority") == priority]
+
+        if project:
+            result = [t for t in result if t.get("project") == project]
+
+        if assignee:
+            result = [t for t in result if t.get("assignee") == assignee]
+
+        if tags:
+            # Filter todos that contain ALL specified tags
+            for tag in tags:
+                result = [t for t in result if tag in t.get("tags", [])]
 
         return result
 
@@ -113,8 +140,11 @@ def main():
         print("Usage: todo_manager.py <command> [args...]")
         print("\nCommands:")
         print("  add <title> [--category CAT] [--priority PRI] [--due-date DATE]")
+        print("              [--project PROJ] [--assignee WHO] [--tags TAG1,TAG2] [--description DESC]")
         print("  list [--category CAT] [--status STATUS] [--priority PRI]")
+        print("            [--project PROJ] [--assignee WHO] [--tags TAG1,TAG2]")
         print("  update <id> [--title TITLE] [--status STATUS] [--priority PRI] [--due-date DATE]")
+        print("             [--project PROJ] [--assignee WHO] [--tags TAG1,TAG2] [--description DESC]")
         print("  delete <id>")
         print("  search <keyword>")
         sys.exit(1)
@@ -135,6 +165,10 @@ def main():
         category = "general"
         priority = "medium"
         due_date = None
+        project = None
+        assignee = None
+        tags = None
+        description = None
 
         i = 3
         while i < len(sys.argv):
@@ -147,16 +181,31 @@ def main():
             elif sys.argv[i] == "--due-date" and i + 1 < len(sys.argv):
                 due_date = sys.argv[i + 1]
                 i += 2
+            elif sys.argv[i] == "--project" and i + 1 < len(sys.argv):
+                project = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--assignee" and i + 1 < len(sys.argv):
+                assignee = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--tags" and i + 1 < len(sys.argv):
+                tags = [tag.strip() for tag in sys.argv[i + 1].split(",")]
+                i += 2
+            elif sys.argv[i] == "--description" and i + 1 < len(sys.argv):
+                description = sys.argv[i + 1]
+                i += 2
             else:
                 i += 1
 
-        todo = manager.add_todo(title, category, priority, due_date)
+        todo = manager.add_todo(title, category, priority, due_date, project, assignee, tags, description)
         print(json.dumps(todo, ensure_ascii=False, indent=2))
 
     elif command == "list":
         category = None
         status = None
         priority = None
+        project = None
+        assignee = None
+        tags = None
 
         i = 2
         while i < len(sys.argv):
@@ -169,10 +218,19 @@ def main():
             elif sys.argv[i] == "--priority" and i + 1 < len(sys.argv):
                 priority = sys.argv[i + 1]
                 i += 2
+            elif sys.argv[i] == "--project" and i + 1 < len(sys.argv):
+                project = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--assignee" and i + 1 < len(sys.argv):
+                assignee = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--tags" and i + 1 < len(sys.argv):
+                tags = [tag.strip() for tag in sys.argv[i + 1].split(",")]
+                i += 2
             else:
                 i += 1
 
-        todos = manager.list_todos(category, status, priority)
+        todos = manager.list_todos(category, status, priority, project, assignee, tags)
         print(json.dumps(todos, ensure_ascii=False, indent=2))
 
     elif command == "update":
@@ -199,6 +257,18 @@ def main():
                 i += 2
             elif sys.argv[i] == "--due-date" and i + 1 < len(sys.argv):
                 updates["due_date"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--project" and i + 1 < len(sys.argv):
+                updates["project"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--assignee" and i + 1 < len(sys.argv):
+                updates["assignee"] = sys.argv[i + 1]
+                i += 2
+            elif sys.argv[i] == "--tags" and i + 1 < len(sys.argv):
+                updates["tags"] = [tag.strip() for tag in sys.argv[i + 1].split(",")]
+                i += 2
+            elif sys.argv[i] == "--description" and i + 1 < len(sys.argv):
+                updates["description"] = sys.argv[i + 1]
                 i += 2
             else:
                 i += 1
