@@ -24,7 +24,16 @@ class JournalManager:
 
         try:
             with open(self.data_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # Ensure we have a list and all items are dictionaries
+                if not isinstance(data, list):
+                    print(f"Warning: Invalid data format in {self.data_file}, starting fresh", file=sys.stderr)
+                    return []
+                # Filter out any non-dict items
+                valid_journals = [item for item in data if isinstance(item, dict)]
+                if len(valid_journals) != len(data):
+                    print(f"Warning: Filtered {len(data) - len(valid_journals)} invalid items from {self.data_file}", file=sys.stderr)
+                return valid_journals
         except json.JSONDecodeError:
             print(f"Warning: Could not parse {self.data_file}, starting fresh", file=sys.stderr)
             return []

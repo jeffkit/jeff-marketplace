@@ -24,7 +24,16 @@ class TodoManager:
 
         try:
             with open(self.data_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                data = json.load(f)
+                # Ensure we have a list and all items are dictionaries
+                if not isinstance(data, list):
+                    print(f"Warning: Invalid data format in {self.data_file}, starting fresh", file=sys.stderr)
+                    return []
+                # Filter out any non-dict items
+                valid_todos = [item for item in data if isinstance(item, dict)]
+                if len(valid_todos) != len(data):
+                    print(f"Warning: Filtered {len(data) - len(valid_todos)} invalid items from {self.data_file}", file=sys.stderr)
+                return valid_todos
         except json.JSONDecodeError:
             print(f"Warning: Could not parse {self.data_file}, starting fresh", file=sys.stderr)
             return []
@@ -56,7 +65,8 @@ class TodoManager:
                    status: Optional[str] = None,
                    priority: Optional[str] = None) -> List[Dict]:
         """List todos with optional filters"""
-        result = self.todos
+        # Filter out any non-dict items that might have corrupted the data
+        result = [t for t in self.todos if isinstance(t, dict)]
 
         if category:
             result = [t for t in result if t.get("category") == category]
@@ -72,7 +82,7 @@ class TodoManager:
     def update_todo(self, todo_id: int, **kwargs) -> Optional[Dict]:
         """Update a TODO item"""
         for todo in self.todos:
-            if todo["id"] == todo_id:
+            if isinstance(todo, dict) and todo.get("id") == todo_id:
                 for key, value in kwargs.items():
                     if value is not None:
                         todo[key] = value
@@ -84,7 +94,7 @@ class TodoManager:
     def delete_todo(self, todo_id: int) -> bool:
         """Delete a TODO item"""
         initial_len = len(self.todos)
-        self.todos = [t for t in self.todos if t["id"] != todo_id]
+        self.todos = [t for t in self.todos if not (isinstance(t, dict) and t.get("id") == todo_id)]
         if len(self.todos) < initial_len:
             self._save_todos()
             return True
@@ -93,7 +103,8 @@ class TodoManager:
     def search_todos(self, keyword: str) -> List[Dict]:
         """Search todos by keyword in title"""
         keyword_lower = keyword.lower()
-        return [t for t in self.todos if keyword_lower in t.get("title", "").lower()]
+        valid_todos = [t for t in self.todos if isinstance(t, dict)]
+        return [t for t in valid_todos if keyword_lower in t.get("title", "").lower()]
 
 
 def main():
