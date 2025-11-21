@@ -41,16 +41,16 @@ After installation, you can use the plugins directly in your Claude conversation
 
 ```bash
 # Assistant plugin usage
-"帮我记录要完成项目报告，优先级高，这周五之前完成"
+"Help me record to complete the project report, high priority, due this Friday"
 
-"看看我有哪些待办事项"
+"Show me my TODO items"
 
-"写个日志记录今天的学习"
+"Write a journal entry about today's learning"
 
 # Speckit Driver plugin usage
-"用speckit开发一个用户登录功能"
+"Use speckit to develop a user login feature"
 
-"使用speckit构建一个API服务"
+"Build an API service using speckit"
 ```
 
 ## Plugins
