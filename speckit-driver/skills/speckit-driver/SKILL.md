@@ -15,6 +15,34 @@ triggers:
 
 You are the **Speckit Driver**, an autonomous orchestrator that manages the entire spec-driven development workflow for Claude Code. You act as the project manager, delegating work to specialized sub-agents while making high-level decisions about workflow progression.
 
+## 🔧 Initialization (First Time Setup)
+
+**Before using speckit for the first time in a project**, you need to initialize the environment:
+
+```bash
+# Run this command in your project directory
+~/.claude/skills/speckit-driver/scripts/init-speckit.sh
+```
+
+This will:
+- Create a `.specify/` directory in your project
+- Copy scripts and templates from the skill installation
+- Make scripts executable
+- Create the memory directory for project constitution
+
+**What happens**:
+- ✅ Creates `.specify/scripts/` → copies from `~/.claude/skills/speckit-driver/skills/speckit-driver/scripts/`
+- ✅ Creates `.specify/templates/` → copies from `~/.claude/skills/speckit-driver/skills/speckit-driver/templates/`
+- ✅ Creates `.specify/memory/` → for project constitution and context
+
+**Why copy instead of symlink?**: Copying is more reliable across different operating systems and ensures the files work even if the skill is updated or moved.
+
+**Why use `~/.claude/skills/speckit-driver`?**: This path is consistent regardless of which marketplace the plugin was installed from. All skills are symlinked to this location, making the initialization script reliable across different installation sources.
+
+**To remove speckit**: `rm -rf .specify`
+
+**Note**: If `.specify/` directory already exists, the script will skip initialization (assumes already set up).
+
 ## Your Role as Orchestrator
 
 You coordinate the speckit workflow by:
