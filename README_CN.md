@@ -1,8 +1,16 @@
 # Jeff Marketplace
 
+
 [English Documentation](README.md)
 
 Jeff 工作流的插件集合，旨在通过个人助手和自主开发能力增强 Claude Code。
+
+
+## 使用 Agent Studio 安装
+
+[Agent Studio](https://github.com/okguitar/agentstudio)
+
+![Agent Studio 安装](docs/images/agentstudio-zh.png)
 
 ## 使用 Claude Code CLI 安装
 
@@ -25,15 +33,10 @@ Jeff 工作流的插件集合，旨在通过个人助手和自主开发能力增
 
    # 安装 Speckit Driver 插件用于自主开发
    /plugin install speckit-driver@jeff-choices
+
+   # 浏览所有插件或进行互动式安装
+   /plugin
    ```
-
-### 插件管理命令
-
-- **列出可用插件**: `/plugin list`
-- **列出已安装插件**: `/plugin list --installed`
-- **卸载插件**: `/plugin uninstall <插件名称>`
-- **更新插件**: `/plugin update <插件名称>`
-- **移除市场源**: `/plugin marketplace remove <市场源名称>`
 
 ### 使用示例
 

@@ -4,6 +4,13 @@
 
 A collection of plugins for Jeff's workflow, designed to enhance Claude Code with personal assistance and autonomous development capabilities.
 
+
+## Installation with Agent Studio
+
+[Agent Studio](https://github.com/okguitar/agentstudio)
+
+![Agent Studio Installation](docs/images/agentstudio-en.png)
+
 ## Installation with Claude Code CLI
 
 ### Quick Install
@@ -25,15 +32,11 @@ A collection of plugins for Jeff's workflow, designed to enhance Claude Code wit
 
    # Install the Speckit Driver plugin for autonomous development
    /plugin install speckit-driver@jeff-choices
+
+   # Browse available plugins and install interactively
+   /plugin
+
    ```
-
-### Plugin Management Commands
-
-- **List available plugins**: `/plugin list`
-- **List installed plugins**: `/plugin list --installed`
-- **Uninstall a plugin**: `/plugin uninstall <plugin-name>`
-- **Update a plugin**: `/plugin update <plugin-name>`
-- **Remove marketplace**: `/plugin marketplace remove <marketplace-name>`
 
 ### Usage Examples
 
