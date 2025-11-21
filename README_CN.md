@@ -4,11 +4,60 @@
 
 Jeff 工作流的插件集合，旨在通过个人助手和自主开发能力增强 Claude Code。
 
+## 使用 Claude Code CLI 安装
+
+### 快速安装
+
+1. **启动 Claude Code CLI**:
+   ```bash
+   claude
+   ```
+
+2. **添加此市场源**:
+   ```bash
+   /plugin marketplace add https://github.com/jeffkit/jeff-marketplace.git
+   ```
+
+3. **安装插件**:
+   ```bash
+   # 安装 Assistant 插件用于个人生产力
+   /plugin install assistant@jeff-choices
+
+   # 安装 Speckit Driver 插件用于自主开发
+   /plugin install speckit-driver@jeff-choices
+   ```
+
+### 插件管理命令
+
+- **列出可用插件**: `/plugin list`
+- **列出已安装插件**: `/plugin list --installed`
+- **卸载插件**: `/plugin uninstall <插件名称>`
+- **更新插件**: `/plugin update <插件名称>`
+- **移除市场源**: `/plugin marketplace remove <市场源名称>`
+
+### 使用示例
+
+安装后，您可以直接在 Claude 对话中使用这些插件：
+
+```bash
+# Assistant 插件使用
+"帮我记录要完成项目报告，优先级高，这周五之前完成"
+
+"看看我有哪些待办事项"
+
+"写个日志记录今天的学习"
+
+# Speckit Driver 插件使用
+"用speckit开发一个用户登录功能"
+
+"使用speckit构建一个API服务"
+```
+
 ## 插件列表
 
 ### 1. Assistant (个人助手)
 
-**版本:** 2.1.0
+**版本:** 2.2.0
 **描述:** 用于管理 TODO 和日志条目的个人助手，支持通过自然对话进行任务跟踪、活动记录和智能查询。
 
 #### 技能 (Skills)
