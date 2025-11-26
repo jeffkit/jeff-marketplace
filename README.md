@@ -33,6 +33,9 @@ A collection of plugins for Jeff's workflow, designed to enhance Claude Code wit
    # Install the Speckit Driver plugin for autonomous development
    /plugin install speckit-driver@jeff-choices
 
+   # Install the Nano-PPT plugin for AI-powered presentation creation
+   /plugin install nano-ppt@jeff-choices
+
    # Browse available plugins and install interactively
    /plugin
 
@@ -54,6 +57,13 @@ After installation, you can use the plugins directly in your Claude conversation
 "Use speckit to develop a user login feature"
 
 "Build an API service using speckit"
+
+# Nano-PPT plugin usage
+"Create a presentation about quarterly business results"
+
+"Make a PowerPoint for the project proposal"
+
+"Generate slides for the team meeting"
 ```
 
 ## Plugins
@@ -108,3 +118,54 @@ This plugin utilizes a suite of specialized sub-agents:
 - **speckit-tasks**: Breaks down plans into actionable tasks and user stories.
 - **speckit-analyze**: Performs cross-artifact consistency analysis (spec/plan/tasks) to ensure alignment.
 - **speckit-implement**: Executes the implementation phase, monitoring progress and handling errors.
+
+---
+
+### 3. Nano-PPT
+
+**Version:** 1.0.0
+**Description:** AI-powered presentation creator that generates professional PowerPoint slides using Google's Gemini AI model for image generation.
+
+#### Prerequisites
+
+Before using this plugin, you need to set up the following:
+
+- **Google GenAI API Key**: Set the `GEMINI_API_KEY` environment variable
+- **Python Dependencies**: Install required packages with `pip install -r nano-ppt/requirements.txt`
+
+```bash
+# Install dependencies
+cd nano-ppt
+pip install -r requirements.txt
+
+# Set your API key
+export GEMINI_API_KEY="your-google-ai-api-key"
+```
+
+#### Skills
+
+- **nano-ppt**: The main orchestrator skill that manages the 4-phase presentation creation workflow.
+    - **Capabilities**:
+        - **Requirements Gathering**: Interactive Q&A session to understand presentation needs
+        - **Structured Workflow**: 4-phase process (Requirements → Brief Outline → Detailed Outline → Generation)
+        - **Visual Consistency**: Uses reference images to maintain style across slides
+        - **User Approval Gates**: Requires user approval before each phase transition
+        - **Sequential Generation**: Creates slides in order to ensure coherence
+    - **Triggers**: "Create a presentation", "Make a PowerPoint", "Generate slides", "创建PPT", "制作演示文稿"
+    - **Output**: Generated slides are saved to `./ppt-output/[presentation-name]/` directory
+
+#### Agents
+
+This plugin utilizes a suite of specialized sub-agents:
+
+- **nanoppt-requirements**: Conducts conversational interviews to gather presentation requirements.
+- **nanoppt-brief-outline**: Creates high-level slide structure with titles, main ideas, and transitions.
+- **nanoppt-detailed-outline**: Expands to production-ready specifications with complete content and visual requirements.
+- **nanoppt-slide-generator**: Generates individual slides as images using Google Gemini AI.
+
+#### Workflow Phases
+
+1. **Requirements Gathering**: Interactive Q&A to understand presentation goals, audience, and style preferences
+2. **Brief Outline**: High-level slide structure with narrative flow and key messages
+3. **Detailed Outline**: Complete content specifications including text, visual elements, and styling requirements
+4. **Slide Generation**: Sequential image generation using Google Gemini with visual consistency across slides

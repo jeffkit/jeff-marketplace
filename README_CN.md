@@ -34,6 +34,9 @@ Jeff 工作流的插件集合，旨在通过个人助手和自主开发能力增
    # 安装 Speckit Driver 插件用于自主开发
    /plugin install speckit-driver@jeff-choices
 
+   # 安装 Nano-PPT 插件用于 AI 驱动的演示文稿创建
+   /plugin install nano-ppt@jeff-choices
+
    # 浏览所有插件或进行互动式安装
    /plugin
    ```
@@ -54,6 +57,13 @@ Jeff 工作流的插件集合，旨在通过个人助手和自主开发能力增
 "用speckit开发一个用户登录功能"
 
 "使用speckit构建一个API服务"
+
+# Nano-PPT 插件使用
+"创建一个关于季度业务成果的演示文稿"
+
+"为项目提案制作一份PPT"
+
+"生成团队会议用的幻灯片"
 ```
 
 ## 插件列表
@@ -107,3 +117,54 @@ python3 assistant/skills/assistant/scripts/migrate_data.py
 - **speckit-tasks**: 将计划分解为可执行的任务和用户故事。
 - **speckit-analyze**: 执行跨工件一致性分析 (spec/plan/tasks) 以确保对齐。
 - **speckit-implement**: 执行实施阶段，监控进度并处理错误。
+
+---
+
+### 3. Nano-PPT (AI 演示文稿生成器)
+
+**版本:** 1.0.0
+**描述:** 使用 Google Gemini AI 模型生成专业 PowerPoint 幻灯片的 AI 驱动演示文稿创建器。
+
+#### 前置条件
+
+使用此插件前，您需要进行以下设置：
+
+- **Google GenAI API 密钥**: 设置 `GEMINI_API_KEY` 环境变量
+- **Python 依赖**: 使用 `pip install -r nano-ppt/requirements.txt` 安装必需的包
+
+```bash
+# 安装依赖
+cd nano-ppt
+pip install -r requirements.txt
+
+# 设置您的 API 密钥
+export GEMINI_API_KEY="your-google-ai-api-key"
+```
+
+#### 技能 (Skills)
+
+- **nano-ppt**: 管理 4 阶段演示文稿创建工作流的主要编排器技能。
+    - **功能**:
+        - **需求收集**: 通过互动问答了解演示文稿需求
+        - **结构化工作流**: 4 阶段流程（需求收集 → 简要大纲 → 详细大纲 → 幻灯片生成）
+        - **视觉一致性**: 使用参考图像保持幻灯片间的风格统一
+        - **用户审批门槛**: 每个阶段转换前需要用户批准
+        - **顺序生成**: 按顺序创建幻灯片以确保连贯性
+    - **触发词**: "Create a presentation", "Make a PowerPoint", "Generate slides", "创建PPT", "制作演示文稿"
+    - **输出**: 生成的幻灯片保存到 `./ppt-output/[presentation-name]/` 目录
+
+#### 代理 (Agents)
+
+该插件使用一套专门的子代理：
+
+- **nanoppt-requirements**: 通过对话访谈收集演示文稿需求。
+- **nanoppt-brief-outline**: 创建带有标题、主要思想和过渡的高层级幻灯片结构。
+- **nanoppt-detailed-outline**: 扩展为具有完整内容和视觉要求的就绪生产规范。
+- **nanoppt-slide-generator**: 使用 Google Gemini AI 生成单独的幻灯片图像。
+
+#### 工作流阶段
+
+1. **需求收集**: 互动问答以了解演示文稿目标、受众和风格偏好
+2. **简要大纲**: 带有叙事流程和关键信息的幻灯片高层级结构
+3. **详细大纲**: 包含文本、视觉元素和样式要求的完整内容规范
+4. **幻灯片生成**: 使用 Google Gemini 进行顺序图像生成，确保幻灯片间的视觉一致性
