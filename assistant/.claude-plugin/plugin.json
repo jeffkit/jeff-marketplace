@@ -1,11 +1,22 @@
 {
-    "name": "assistant",
-    "version": "2.2.0",
-    "description": "Personal assistant for managing TODOs and journal entries, supporting task tracking, activity logging, and smart querying through natural conversation.",
-    "author": {
-        "name": "jeff kit",
-        "email": "bbmyth@gmail.com"
-    },
-    "license": "MIT",
-    "skills": "./skills/"
+  "name": "assistant",
+  "version": "2.2.0",
+  "description": "Personal assistant for managing TODOs and journal entries, supporting task tracking, activity logging, and smart querying through natural conversation.",
+  "author": {
+    "name": "jeffkit",
+    "email": "bbmyth@gmail.com"
+  },
+  "homepage": "https://github.com/jeffkit/jeff-marketplace/tree/main/assistant#readme",
+  "repository": "https://github.com/jeffkit/jeff-marketplace.git",
+  "license": "MIT",
+  "keywords": [
+    "assistant",
+    "todo",
+    "journal",
+    "productivity",
+    "task-management",
+    "claude-code",
+    "plugin"
+  ],
+  "skills": "./skills/"
 }

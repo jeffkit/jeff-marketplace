@@ -1,17 +1,24 @@
 {
   "name": "nano-ppt",
   "version": "1.0.0",
-  "description": "AI-powered PPT presentation creation using Google's Gemini image generation",
-  "author": "jeffkit <bbmyth@gmail.com>",
+  "description": "AI-powered PPT presentation creation using Google's Gemini image generation (gemini-2.5-flash-image)",
+  "author": {
+    "name": "jeffkit",
+    "email": "bbmyth@gmail.com"
+  },
+  "homepage": "https://github.com/jeffkit/jeff-marketplace/tree/main/nano-ppt#readme",
   "repository": "https://github.com/jeffkit/jeff-marketplace.git",
-  "skills": [
-    "nano-ppt"
+  "license": "MIT",
+  "keywords": [
+    "presentation",
+    "ppt",
+    "powerpoint",
+    "slides",
+    "gemini",
+    "image-generation",
+    "claude-code",
+    "plugin"
   ],
-  "dependencies": {
-    "python": ">=3.8",
-    "packages": [
-      "google-genai",
-      "Pillow"
-    ]
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }

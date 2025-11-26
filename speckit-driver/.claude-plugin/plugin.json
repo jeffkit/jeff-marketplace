@@ -8,13 +8,7 @@
     "url": "https://github.com/jeffkit"
   },
   "homepage": "https://github.com/jeffkit/speckit-driver#readme",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jeffkit/speckit-driver.git"
-  },
-  "bugs": {
-    "url": "https://github.com/jeffkit/speckit-driver/issues"
-  },
+  "repository": "https://github.com/jeffkit/speckit-driver.git",
   "license": "MIT",
   "keywords": [
     "speckit",
