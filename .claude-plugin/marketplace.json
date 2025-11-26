@@ -18,6 +18,11 @@
             "name": "speckit-driver",
             "source": "./speckit-driver",
             "description": "Autonomous Spec-Driven Development orchestrator that enables intelligent, continuous workflow execution (constitution -> specify -> plan -> tasks -> implement) with minimal user intervention."
+        },
+        {
+            "name": "nano-ppt",
+            "source": "./nano-ppt",
+            "description": "AI-powered PPT presentation creator using Google's Gemini image generation model (nano-banana), enabling professional presentation creation through a structured, four-phase workflow."
         }
     ]
 }

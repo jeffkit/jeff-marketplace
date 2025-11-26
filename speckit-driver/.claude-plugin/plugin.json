@@ -19,7 +19,5 @@
     "orchestrator",
     "quality-gates",
     "sub-agents"
-  ],
-  "agents": "./agents/",
-  "skills": "./skills/"
+  ]
 }

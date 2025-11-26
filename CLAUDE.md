@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Jeff Marketplace is a collection of Claude Code plugins designed to enhance personal productivity and autonomous development capabilities. The repository contains two main plugins:
+Jeff Marketplace is a collection of Claude Code plugins designed to enhance personal productivity and autonomous development capabilities. The repository contains three main plugins:
 
 1. **Assistant** (v2.1.0) - Personal assistant for TODO and journal management
 2. **Speckit Driver** (v1.1.1) - Autonomous spec-driven development orchestrator
+3. **Nano-PPT** (v1.0.0) - AI-powered PPT presentation creator using Google Gemini
 
 This is a **plugin repository**, not an application codebase. Each plugin is self-contained in its own directory with independent versioning and functionality.
 
@@ -40,6 +41,23 @@ jeff-marketplace/
 │   └── skills/
 │       └── speckit-driver/
 │           └── SKILL.md         # Main orchestrator skill
+│
+├── nano-ppt/                     # AI-powered presentation creator
+│   ├── .claude-plugin/
+│   │   └── plugin.json          # Plugin metadata (v1.0.0)
+│   ├── agents/                  # Sub-agent prompts
+│   │   ├── nanoppt-requirements.md      # Requirements gathering
+│   │   ├── nanoppt-brief-outline.md     # Brief outline creation
+│   │   ├── nanoppt-detailed-outline.md  # Detailed outline creation
+│   │   └── nanoppt-slide-generator.md   # Slide generation
+│   ├── skills/
+│   │   └── nano-ppt/
+│   │       ├── SKILL.md         # Main orchestrator skill
+│   │       └── scripts/
+│   │           └── slide_generator.py   # Google Gemini integration
+│   ├── requirements.txt         # Python dependencies
+│   ├── README.md                # Plugin documentation
+│   └── EXAMPLES.md              # Usage examples
 │
 └── .assistant/                   # Assistant data storage (gitignored)
     ├── todos.json               # Persistent TODO storage
@@ -113,6 +131,48 @@ The `speckit-driver` skill acts as project manager, not executor:
 2. **Checklist Gate**: Validates requirement quality
 3. **Analysis Gate**: Ensures spec/plan/tasks consistency
 
+### Nano-PPT Plugin
+
+The Nano-PPT plugin creates professional PPT presentations using Google's Gemini image generation model (gemini-2.5-flash-image).
+
+**Workflow Phases:**
+1. **Requirements Gathering** (Phase 1): Conversational interview to understand presentation needs
+2. **Brief Outline** (Phase 2): High-level slide structure with titles, main ideas, and transitions
+3. **Detailed Outline** (Phase 3): Complete content and visual specifications for each slide
+4. **Slide Generation** (Phase 4): Sequential image generation using Google Gemini
+
+**Sub-Agents:**
+Each agent is defined in `agents/` directory and handles one workflow phase:
+- `nanoppt-requirements`: Gathers presentation requirements through Q&A
+- `nanoppt-brief-outline`: Creates slide structure and narrative flow
+- `nanoppt-detailed-outline`: Expands to production-ready specifications
+- `nanoppt-slide-generator`: Generates individual slides as images
+
+**Skill Activation:**
+The `nano-ppt` skill is triggered by presentation creation requests:
+- "创建PPT" (Create PPT)
+- "制作演示文稿" (Make presentation)
+- "Create a slide deck about..."
+- "Make a PowerPoint presentation for..."
+
+**Skill Role:**
+The `nano-ppt` skill acts as project manager and orchestrator:
+- Delegates work to sub-agents via Task tool
+- Manages user approval at each phase transition
+- Ensures visual consistency across generated slides
+- Handles iterations and feedback
+- Coordinates sequential slide generation
+
+**Key Features:**
+1. **Visual Consistency**: Uses reference images to maintain style across slides
+2. **Structured Workflow**: User approval required before each phase
+3. **Context-Aware Generation**: Each slide receives PPT overview and adjacent slide context
+4. **Flexible Styling**: Supports various presentation styles and aspect ratios
+
+**Prerequisites:**
+- Google GenAI API key (`GEMINI_API_KEY` environment variable)
+- Python packages: `google-genai`, `Pillow`
+
 ## Working with This Repository
 
 ### Testing Assistant Plugin
@@ -148,6 +208,41 @@ The speckit-driver plugin is designed to be used through the Claude Code skill s
 2. Follow the orchestrated workflow from constitution to implementation
 3. Review generated artifacts in `.specify/` directory
 
+### Testing Nano-PPT Plugin
+
+**Prerequisites setup:**
+```bash
+# Install dependencies
+cd nano-ppt
+pip install -r requirements.txt
+
+# Set API key
+export GEMINI_API_KEY="your-google-ai-api-key"
+```
+
+**Using through the skill:**
+The nano-ppt plugin is designed to be used through the Claude Code skill system:
+
+1. Trigger with phrases like "创建PPT" or "Create a presentation about..."
+2. Follow the 4-phase workflow with user approval at each stage
+3. Generated slides saved to `./ppt-output/[presentation-name]/`
+
+**Direct script testing (for development):**
+```bash
+# Test slide generation directly
+python3 nano-ppt/skills/nano-ppt/scripts/slide_generator.py \
+  "Create a professional title slide for 'Q4 Marketing Results'" \
+  ./test-slide.png \
+  --aspect-ratio 16:9
+
+# Test with reference image for consistency
+python3 nano-ppt/skills/nano-ppt/scripts/slide_generator.py \
+  "Executive summary slide with key metrics" \
+  ./test-slide-2.png \
+  --aspect-ratio 16:9 \
+  --reference-image ./test-slide.png
+```
+
 ### Version Updates
 
 When updating plugin versions:
@@ -181,12 +276,14 @@ Each plugin can be distributed independently:
 ### Skill Triggers
 - Assistant skill: Responds to Chinese phrases for task/journal management
 - Speckit Driver skill: Responds to Chinese/English phrases for spec-driven development
-- Both skills use natural language triggers, not command-line flags
+- Nano-PPT skill: Responds to presentation creation requests in Chinese/English
+- All skills use natural language triggers, not command-line flags
 
 ### Agent Coordination
-- Speckit Driver agents are invoked via Task tool, not directly
+- Speckit Driver and Nano-PPT agents are invoked via Task tool, not directly
 - Each agent has a specific input/output contract defined in its .md file
-- The orchestrator (speckit-driver skill) manages agent sequencing and error handling
+- The orchestrator skills (speckit-driver, nano-ppt) manage agent sequencing and error handling
+- Both plugins follow the orchestrator pattern: main skill coordinates, sub-agents execute
 
 ## Development Guidelines
 
@@ -204,12 +301,21 @@ Each plugin can be distributed independently:
 3. Test workflow progression through all phases
 4. Ensure task marking verification works correctly (critical for Phase 4)
 
+### Adding New Features to Nano-PPT
+
+1. Edit agent prompts in `nano-ppt/agents/` for workflow changes
+2. Update slide generation script `nano-ppt/skills/nano-ppt/scripts/slide_generator.py` for new generation features
+3. Modify orchestrator logic in `nano-ppt/skills/nano-ppt/SKILL.md` for workflow updates
+4. Test all 4 phases to ensure smooth transitions
+5. Update EXAMPLES.md with new use cases
+
 ### Cross-Plugin Compatibility
 
-Plugins are independent and do not share code or data. Changes to one plugin should not affect the other. However, both follow Claude Code plugin conventions:
+Plugins are independent and do not share code or data. Changes to one plugin should not affect the others. However, all follow Claude Code plugin conventions:
 - `.claude-plugin/plugin.json` for metadata
 - `skills/` directory for skill definitions
 - SKILL.md frontmatter for skill metadata
+- `agents/` directory for sub-agent definitions (when using orchestrator pattern)
 
 ## Architecture Principles
 
@@ -225,6 +331,14 @@ Plugins are independent and do not share code or data. Changes to one plugin sho
 - **Progressive Elaboration**: Each phase adds detail (constitution → spec → plan → tasks)
 - **Task Marking Protection**: 4-layer verification ensures task completion tracking accuracy
 - **Continuous Workflow**: Minimal user intervention after initial feature description
+
+### Nano-PPT Plugin
+- **Orchestrator Pattern**: Main skill coordinates, sub-agents execute workflow phases
+- **Phase-Based Workflow**: Requirements → Brief Outline → Detailed Outline → Generation
+- **User Approval Gates**: User reviews and approves at each phase transition
+- **Visual Consistency**: Reference images passed between slides to maintain style
+- **Sequential Generation**: Slides generated in order to ensure coherence
+- **Context-Aware**: Each slide receives presentation overview and adjacent slide context
 
 ## Data Schemas
 
@@ -315,6 +429,8 @@ python3 scripts/todo_manager.py list --project my-project
 vim assistant/.claude-plugin/plugin.json
 # or
 vim speckit-driver/.claude-plugin/plugin.json
+# or
+vim nano-ppt/.claude-plugin/plugin.json
 ```
 
 ### Review Skill Documentation
@@ -324,6 +440,9 @@ cat assistant/skills/assistant/SKILL.md
 
 # Speckit Driver skill
 cat speckit-driver/skills/speckit-driver/SKILL.md
+
+# Nano-PPT skill
+cat nano-ppt/skills/nano-ppt/SKILL.md
 ```
 
 ### Inspect Agent Definitions
@@ -331,8 +450,14 @@ cat speckit-driver/skills/speckit-driver/SKILL.md
 # List all speckit agents
 ls speckit-driver/agents/
 
-# Read specific agent
+# Read specific speckit agent
 cat speckit-driver/agents/speckit-specify.md
+
+# List all nano-ppt agents
+ls nano-ppt/agents/
+
+# Read specific nano-ppt agent
+cat nano-ppt/agents/nanoppt-slide-generator.md
 ```
 
 ### Check Data Files

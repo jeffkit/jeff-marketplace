@@ -18,7 +18,5 @@
     "image-generation",
     "claude-code",
     "plugin"
-  ],
-  "agents": "./agents/",
-  "skills": "./skills/"
+  ]
 }
