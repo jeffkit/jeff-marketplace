@@ -29,20 +29,23 @@ The skill follows a structured, phased approach:
 
 **Phase 1: Requirements Gathering** → **Phase 2: Brief Outline** → **Phase 3: Detailed Outline** → **Phase 4: Slide Generation**
 
-Each phase uses specialized sub-agents and requires user approval before proceeding to the next phase.
+- **Phases 1-3**: You execute directly, gathering user feedback and iterating in real-time
+- **Phase 4**: Delegate to sub-agents for parallel/sequential image generation
 
-## Your Role as Orchestrator
+## Your Role
 
-You are the **project manager**, not the executor. Your responsibilities:
+You are both the **designer** and **orchestrator**:
 
-1. **Delegate work** to sub-agents via the Task tool
-2. **Review outputs** critically - don't blindly accept sub-agent results
-3. **Manage user interactions** - gather approvals, handle feedback
-4. **Make continuation decisions** - determine when to proceed to next phase
-5. **Ensure quality** - verify outputs meet requirements at each stage
-6. **Handle errors** - troubleshoot issues and retry if needed
+**Phases 1-3 (Design)**:
+1. **Gather requirements** - Interview user conversationally
+2. **Create outlines** - Draft brief and detailed outlines yourself
+3. **Iterate with user** - Get immediate feedback, make adjustments
+4. **Save artifacts** - Write all intermediate files to disk for user review/editing
 
-**CRITICAL**: Do NOT execute the work yourself. Always use sub-agents for each phase.
+**Phase 4 (Generation)**:
+1. **Delegate to sub-agents** - Use Task tool for slide generation
+2. **Track progress** - Report status after each slide
+3. **Handle errors** - Retry failed generations with adjusted parameters
 
 ## Detailed Workflow
 
@@ -50,148 +53,263 @@ You are the **project manager**, not the executor. Your responsibilities:
 
 **Objective**: Understand what presentation the user wants to create.
 
-**Process**:
-1. Invoke the `nanoppt-requirements` sub-agent
-2. The agent will conduct a conversational interview with the user
-3. Agent returns a structured JSON requirements document
-4. You review and confirm the requirements with the user
+**Process** (you execute this yourself):
 
-**Sub-agent invocation**:
-```
-Use Task tool with:
-- subagent_type: "general-purpose"
-- prompt: Read and follow the instructions in agents/nanoppt-requirements.md to gather presentation requirements from the user. Return a complete JSON requirements document.
-```
+1. **Conduct conversational interview** with the user about:
+   - **Presentation Overview**: Target audience, goal, delivery context, tone
+   - **Content Requirements**: Key topics, technical depth, comparisons needed, main message
+   - **Style Requirements**: Visual style, colors, aspect ratio, branding
+   - **Structural Requirements**: Slide count, must-have slide types, organization
 
-**Expected output**: JSON document with presentation overview, content requirements, style requirements, and structural requirements.
+2. **Ask one category at a time** - Don't overwhelm with too many questions
 
-**Quality check**:
-- All required fields populated?
-- Requirements clear and specific?
-- User confirmed requirements are correct?
+3. **Create requirements.json** with this structure:
+   ```json
+   {
+     "presentation_name": "kebab-case-name",
+     "overview": {
+       "title": "Presentation Title",
+       "target_audience": "description",
+       "primary_goal": "description",
+       "delivery_context": "description",
+       "tone": "description"
+     },
+     "content_requirements": {
+       "key_topics": ["topic1", "topic2"],
+       "technical_specs": "level of detail needed",
+       "comparisons": "if any",
+       "call_to_action": "main takeaway"
+     },
+     "style_requirements": {
+       "visual_style": "description",
+       "color_preferences": "description",
+       "aspect_ratio": "16:9",
+       "branding": "guidelines if any"
+     },
+     "structural_requirements": {
+       "slide_count": 5,
+       "must_have_slides": ["type1", "type2"],
+       "organization_notes": "preferences"
+     }
+   }
+   ```
 
-**Proceed to Phase 2 only after** user confirms requirements are complete and accurate.
+4. **Save to disk**: `./ppt-output/[presentation-name]/requirements.json`
+
+5. **Confirm with user**: Present summary and get approval
+
+**Quality checks**:
+- All fields populated and specific?
+- User confirmed requirements?
+
+**Proceed to Phase 2** only after user approval.
 
 ### Phase 2: Brief Outline Creation
 
 **Objective**: Create a high-level outline showing slide titles, main ideas, and transitions.
 
-**Process**:
-1. Invoke the `nanoppt-brief-outline` sub-agent with the requirements
-2. Agent creates brief outline with slide structure and narrative flow
-3. You present the outline to the user for feedback
-4. Iterate based on user feedback until approved
+**Process** (you execute this yourself):
 
-**Sub-agent invocation**:
-```
-Use Task tool with:
-- subagent_type: "general-purpose"
-- prompt: Read and follow the instructions in agents/nanoppt-brief-outline.md. Create a brief outline based on these requirements: [paste requirements JSON]. Return the brief outline in markdown format.
-```
+1. **Draft the brief outline** in markdown format with:
+   - **Presentation Overview**: Topic, audience, key message, total slides, narrative style
+   - **Slide Structure**: For each slide:
+     - Slide number and title
+     - Main idea (2-3 sentences)
+     - Transition relationship to previous/next slides
+   - **Narrative Flow Summary**: Overall story arc
 
-**Expected output**: Markdown outline with:
-- Presentation overview and narrative style
-- Each slide's title, main idea, and transition relationship
-- Narrative flow summary
+2. **Example structure**:
+   ```markdown
+   # [Presentation Title]
 
-**Quality check**:
+   ## Presentation Overview
+   - **Topic**: ...
+   - **Target Audience**: ...
+   - **Key Message**: ...
+   - **Total Slides**: N
+   - **Narrative Style**: ...
+
+   ## Slide Structure
+
+   ### Slide 1: [Title]
+   **Main Idea**: ...
+   **Transition**: Opening slide, sets the tone...
+
+   ### Slide 2: [Title]
+   **Main Idea**: ...
+   **Transition**: Builds on Slide 1 by...
+
+   ...
+
+   ## Narrative Flow Summary
+   [2-3 paragraphs describing the overall story arc]
+   ```
+
+3. **Save to disk**: `./ppt-output/[presentation-name]/brief-outline.md`
+
+4. **Present to user** and ask for feedback:
+   - "Does this structure and flow make sense?"
+   - "Should any slides be added, removed, or reordered?"
+
+5. **Iterate**: Update the file based on feedback and save again
+
+**Quality checks**:
 - Logical flow and structure?
-- Appropriate number of slides?
-- Clear transitions between slides?
-- Matches user's requirements?
+- Appropriate slide count?
+- Clear transitions?
+- Matches requirements?
 
-**User feedback loop**:
-- Ask: "Does this structure and flow make sense?"
-- Ask: "Should any slides be added, removed, or reordered?"
-- Iterate until user approves
-
-**Proceed to Phase 3 only after** user approves the brief outline structure.
+**Proceed to Phase 3** only after user approval.
 
 ### Phase 3: Detailed Outline Creation
 
 **Objective**: Expand the brief outline into production-ready specifications with complete content and visual requirements for each slide.
 
-**Process**:
-1. Invoke the `nanoppt-detailed-outline` sub-agent with approved brief outline and requirements
-2. Agent expands each slide with content specs, visual requirements, layout details
-3. You present the detailed outline to the user for final approval
-4. Make any adjustments based on feedback
+**Process** (you execute this yourself):
 
-**Sub-agent invocation**:
-```
-Use Task tool with:
-- subagent_type: "general-purpose"
-- prompt: Read and follow the instructions in agents/nanoppt-detailed-outline.md. Create a detailed outline based on this approved brief outline: [paste brief outline] and these requirements: [paste requirements]. Return the complete detailed outline in markdown format.
-```
+1. **Create detailed specifications** for each slide in markdown format:
 
-**Expected output**: Markdown outline with:
-- Complete content specifications for each slide (exact text, data, messages)
-- Detailed visual specifications (layout, image requirements, colors, typography)
-- Design notes and consistency guidelines
-- Production notes (color palette, style consistency strategy)
+   For each slide, include:
+   - **Content Specifications**: Exact text, data points, messages
+   - **Visual Specifications**: Layout type, subject, style, composition, specific elements
+   - **Color Emphasis**: Primary and accent colors
+   - **Typography Notes**: Font sizes, weights, effects
+   - **Design Notes**: Intent, mood, key visual goals
+   - **Transition Context**: How it connects to previous/next slides
 
-**Quality check**:
+2. **Add production notes** at the end:
+   - **Overall Design Consistency**: Cross-slide continuity strategy
+   - **Color Palette**: Specific hex codes and usage rules
+   - **Typography Guidelines**: Font hierarchy and effects
+   - **Image Generation Strategy**: How to maintain style consistency
+
+3. **Example structure**:
+   ```markdown
+   # [Presentation Title] - Detailed Outline
+
+   ## Presentation Specifications
+   [Topic, audience, slides, aspect ratio, visual style, colors]
+
+   ---
+
+   ## Slide 1: [Title]
+
+   ### Content Specifications
+   - **Slide Title**: "..."
+   - **Subtitle**: "..."
+   - **Text Content**: ...
+
+   ### Visual Specifications
+   - **Layout Type**: ...
+   - **Subject**: ...
+   - **Style**: ...
+   - **Composition**: ...
+   - **Specific Elements**: ...
+   - **Color Emphasis**: ...
+   - **Typography Notes**: ...
+
+   ### Design Notes
+   [Intent, mood, visual goals]
+
+   ### Transition Context
+   - **Previous Slide**: N/A (first slide)
+   - **Next Slide**: [Preview]
+   - **Narrative Connection**: ...
+
+   ---
+
+   [Repeat for each slide]
+
+   ---
+
+   ## Production Notes
+
+   ### Overall Design Consistency
+   [Continuity strategy]
+
+   ### Color Palette
+   - Primary: #HEX
+   - Secondary: #HEX
+   - Accent: #HEX
+
+   ### Typography Guidelines
+   [Font hierarchy]
+
+   ### Image Generation Strategy
+   [Style consistency approach]
+   ```
+
+4. **Save to disk**: `./ppt-output/[presentation-name]/detailed-outline.md`
+
+5. **Present to user** and ask:
+   - "Is all content accurate and complete?"
+   - "Does the visual direction match your expectations?"
+
+6. **Iterate**: Update based on feedback and save again
+
+**Quality checks**:
 - Every slide fully specified?
-- Visual requirements actionable and specific?
+- Visual requirements actionable?
 - Consistency strategy defined?
-- Aligns with approved brief outline?
+- Aligns with brief outline?
 
-**User feedback loop**:
-- Ask: "Is all content accurate and complete?"
-- Ask: "Does the visual direction match your expectations?"
-- Make adjustments as needed
-
-**Proceed to Phase 4 only after** user approves the detailed outline.
+**Proceed to Phase 4** only after user approval.
 
 ### Phase 4: Slide Generation
 
 **Objective**: Generate each slide as an image file using Google's Gemini model.
 
 **Setup**:
-1. Create output directory: `./ppt-output/[presentation-name]/`
-2. Verify `GEMINI_API_KEY` environment variable is set
-3. Confirm slide generation script is accessible
+1. Verify output directory exists: `./ppt-output/[presentation-name]/`
+2. Check `GEMINI_API_KEY` environment variable is set
+3. Read the detailed outline from disk
 
-**Process**:
-For each slide in the detailed outline (sequentially):
+**Process** (delegate to sub-agent):
 
-1. **Invoke the `nanoppt-slide-generator` sub-agent**:
-   ```
-   Use Task tool with:
-   - subagent_type: "general-purpose"
-   - prompt: Read and follow the instructions in agents/nanoppt-slide-generator.md. Generate Slide [N] of [Total].
+For each slide in the detailed outline, invoke the sub-agent **sequentially**:
 
-     Slide specifications: [paste this slide's detailed specs]
-     Presentation context: [paste overall theme, style, colors]
-     Previous slide: [paste previous slide info and path to image]
-     Next slide preview: [paste next slide title/main idea]
-     Aspect ratio: [from requirements]
-     Output path: ./ppt-output/[presentation-name]/slide_[NN].png
+```
+Use Task tool with:
+- subagent_type: "nano-ppt:nanoppt-slide-generator"
+- prompt: Read and follow the instructions in agents/nanoppt-slide-generator.md.
+  Generate Slide [N] of [Total].
 
-     Generate the slide and report the result.
-   ```
+  Presentation Context:
+  - Topic: [from requirements]
+  - Visual Style: [from requirements]
+  - Color Scheme: [from requirements]
+  - Aspect Ratio: [from requirements]
 
-2. **Track progress**: Update user after each slide is generated
-3. **Handle errors**: If generation fails, review error and retry with adjusted parameters
-4. **Sequential generation**: Always generate slides in order (1, 2, 3, ..., N)
+  Previous Slide Summary:
+  - Slide [N-1]: [brief description and image path]
+  - Image path: ./ppt-output/[name]/slide_[N-1].png
 
-**Why sequential generation**:
-- Each slide references the previous slide's image for style consistency
-- Ensures visual coherence across the presentation
-- Maintains narrative flow
+  Slide [N] Specifications:
+  [Paste the complete slide specifications from detailed-outline.md]
 
-**Progress reporting**:
-After each slide: "✓ Slide [N]/[Total] generated: [title]"
+  Output Path: ./ppt-output/[presentation-name]/slide_[NN].png
+
+  Reference Image: ./ppt-output/[presentation-name]/slide_[N-1].png
+
+  Generate this slide and report the result.
+```
+
+**Key points**:
+- Generate slides **in order** (1, 2, 3, ..., N) for style consistency
+- Each slide (except first) uses previous slide as reference image
+- Report progress after each: "✓ Slide [N]/[Total] generated: [title]"
+- If generation fails, retry with adjusted parameters
 
 **Final output**:
-- All slide images in `./ppt-output/[presentation-name]/`
-- Filenames: `slide_01.png`, `slide_02.png`, ..., `slide_NN.png`
-- Consistent aspect ratio and visual style
+- Slide images: `./ppt-output/[presentation-name]/slide_01.png`, `slide_02.png`, etc.
+- Requirements: `./ppt-output/[presentation-name]/requirements.json`
+- Brief outline: `./ppt-output/[presentation-name]/brief-outline.md`
+- Detailed outline: `./ppt-output/[presentation-name]/detailed-outline.md`
 
-**Quality check**:
-- All slides generated successfully?
+**Quality checks**:
+- All slides generated?
 - Visual consistency maintained?
-- Content matches specifications?
+- Content matches specs?
 
 ## Error Handling
 
@@ -226,97 +344,99 @@ pip install google-genai Pillow
 
 ## File Organization
 
-Generated presentations are organized as:
+All presentation files are saved in a single directory:
 
 ```
 ppt-output/
-├── [presentation-name]/
-│   ├── slide_01.png
-│   ├── slide_02.png
-│   ├── slide_03.png
-│   └── ...
+└── [presentation-name]/
+    ├── requirements.json       # Phase 1 output
+    ├── brief-outline.md        # Phase 2 output
+    ├── detailed-outline.md     # Phase 3 output
+    ├── slide_01.png            # Phase 4 outputs
+    ├── slide_02.png
+    ├── slide_03.png
+    └── ...
 ```
 
-Optionally save outlines for reference:
-```
-ppt-output/
-├── [presentation-name]/
-│   ├── requirements.json
-│   ├── brief-outline.md
-│   ├── detailed-outline.md
-│   ├── slide_01.png
-│   └── ...
-```
+**User can edit files between phases**:
+- After Phase 1: Edit `requirements.json` before proceeding
+- After Phase 2: Edit `brief-outline.md` before proceeding
+- After Phase 3: Edit `detailed-outline.md` before generation
+
+**To use edited files**: Simply read them from disk before proceeding to next phase.
 
 ## Best Practices
 
-### For Orchestration
-1. **Always use sub-agents** - Don't try to do the work yourself
-2. **Review outputs critically** - Verify sub-agent work before presenting to user
-3. **Get user approval** at each phase transition
-4. **Handle feedback gracefully** - Iterate until user is satisfied
-5. **Track state clearly** - Know which phase you're in and what's been approved
+### Phase 1-3 (Design - You Execute)
+1. **Ask focused questions** - One category at a time, don't overwhelm
+2. **Save after each phase** - Write files to disk immediately
+3. **Present summaries** - Show user key points, not full JSON/markdown
+4. **Iterate quickly** - Direct feedback loop, no agent overhead
+5. **Check for edits** - Read files from disk before next phase (user may have edited)
+
+### Phase 4 (Generation - Delegate to Sub-agents)
+1. **Generate sequentially** - Always in order (1, 2, 3, ..., N)
+2. **Pass reference images** - Each slide uses previous as style reference
+3. **Report progress** - Update user after each slide
+4. **Handle errors gracefully** - Retry with adjusted parameters if needed
+5. **Read from detailed-outline.md** - Use the saved file as source of truth
 
 ### For Quality Results
-1. **Gather complete requirements** - Incomplete requirements lead to poor results
-2. **Ensure clear specifications** - Vague outlines produce inconsistent slides
-3. **Maintain visual consistency** - Always pass reference images (except Slide 1)
-4. **Generate sequentially** - Don't skip around or generate in parallel
-5. **Verify before proceeding** - Each phase builds on the previous one
-
-### For User Experience
-1. **Communicate progress clearly** - Let user know what's happening
-2. **Ask for feedback proactively** - Don't assume approval
-3. **Explain the process** - Help user understand the workflow
-4. **Show examples** when requirements are unclear
-5. **Be patient with iterations** - Quality takes refinement
+1. **Complete requirements** - Incomplete specs lead to poor results
+2. **Specific visual descriptions** - Vague outlines produce inconsistent slides
+3. **Clear narrative flow** - Each slide should connect to previous/next
+4. **Consistent color palette** - Define and maintain throughout
+5. **User approval gates** - Don't proceed without confirmation
 
 ## Example Session Flow
 
 **User**: "帮我创建一个关于Q4营销成果的PPT"
 
-**You**: "I'll help you create a PPT presentation about Q4 marketing results. Let me start by gathering your requirements."
+**You**: "I'll help you create a PPT about Q4 marketing results. Let me gather your requirements."
 
-[Invoke nanoppt-requirements agent]
+[You ask questions conversationally]
 
-**Agent**: [Conducts interview, returns requirements JSON]
+**You**: "Who is the target audience?"
+**User**: "Executive team"
+**You**: "What's the main goal?"
+**User**: "Show our achievements and justify budget"
+**You**: "Preferred visual style?"
+**User**: "Professional, data-driven, use company colors"
 
-**You**: "Based on our discussion, here's what I understand: [summarize key requirements]. Is this correct?"
+[Continue interview, then create requirements.json]
 
-**User**: "Yes, that's right."
+**You**: "I've saved the requirements. Here's a summary: [key points]. Does this look correct?"
+**User**: "Yes"
 
-**You**: "Great! Now I'll create a brief outline showing the slide structure and flow."
+**You**: "Great! Now I'll create a brief outline..."
 
-[Invoke nanoppt-brief-outline agent]
+[You create brief-outline.md and present it]
 
-**You**: [Present brief outline] "Does this structure and flow make sense? Should we adjust anything?"
+**You**: "I've outlined 12 slides covering achievements, metrics, challenges, and next steps. Should we adjust anything?"
+**User**: "Add a slide about team growth"
+**You**: "Done. I've updated the outline."
 
-**User**: "Can we add a slide about challenges we faced?"
+[You update brief-outline.md]
 
-**You**: "Absolutely. Let me update the outline."
+**User**: "Perfect"
 
-[Re-invoke with feedback, get revised outline]
+**You**: "Now I'll create the detailed specifications..."
 
-**User**: "Perfect, this looks good."
+[You create detailed-outline.md]
 
-**You**: "Excellent! Now I'll create the detailed outline with complete content and visual specifications for each slide."
+**You**: "I've specified exact content and visuals for each slide. The detailed outline is saved. Please review."
+**User**: "Looks good, let's generate"
 
-[Invoke nanoppt-detailed-outline agent]
+**You**: "Starting generation..."
 
-**You**: [Present detailed outline] "Please review the content and visual direction. Is everything accurate?"
+[You invoke sub-agent for each slide]
 
-**User**: "Yes, let's proceed."
-
-**You**: "Perfect! I'll now generate the slides. This will take a few minutes as I create each slide sequentially to maintain visual consistency."
-
-[Invoke nanoppt-slide-generator for each slide sequentially]
-
-**You**: "✓ Slide 1/12 generated: Title & Key Highlights"
+**You**: "✓ Slide 1/12 generated: Q4 Marketing Results"
 **You**: "✓ Slide 2/12 generated: Executive Summary"
 [...]
-**You**: "✓ Slide 12/12 generated: Next Quarter Priorities"
+**You**: "✓ Slide 12/12 generated: Q1 Priorities"
 
-**You**: "All done! Your presentation is ready in ./ppt-output/q4-marketing-results/ with 12 slides. Each slide maintains consistent visual style and follows the narrative flow we planned."
+**You**: "Done! All files are in ./ppt-output/q4-marketing-results/"
 
 ## Limitations and Considerations
 
@@ -377,11 +497,20 @@ ppt-output/
 
 ## Summary
 
-As the orchestrator, your job is to:
-1. **Guide the user** through the 4-phase workflow
-2. **Delegate work** to specialized sub-agents
-3. **Ensure quality** at each phase transition
-4. **Manage iterations** based on user feedback
-5. **Deliver** a complete presentation with consistent, professional slides
+**Your responsibilities by phase**:
 
-Remember: You coordinate, review, and decide. Sub-agents execute. Users approve and provide feedback.
+**Phases 1-3 (You execute)**:
+1. Interview user conversationally
+2. Create requirements.json, brief-outline.md, detailed-outline.md
+3. Save files after each phase
+4. Get user approval before proceeding
+5. Check for user edits before next phase
+
+**Phase 4 (Delegate to sub-agent)**:
+1. Read detailed-outline.md from disk
+2. Invoke sub-agent for each slide sequentially
+3. Pass reference images for consistency
+4. Report progress to user
+5. Handle errors and retry if needed
+
+**Remember**: Phases 1-3 are interactive design work you do directly. Phase 4 is bulk generation you delegate to sub-agents.

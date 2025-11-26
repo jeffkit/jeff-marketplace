@@ -6,11 +6,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Jeff Marketplace is a collection of Claude Code plugins designed to enhance personal productivity and autonomous development capabilities. The repository contains three main plugins:
 
-1. **Assistant** (v2.1.0) - Personal assistant for TODO and journal management
+1. **Assistant** (v2.2.0) - Personal assistant for TODO and journal management
 2. **Speckit Driver** (v1.1.1) - Autonomous spec-driven development orchestrator
 3. **Nano-PPT** (v1.0.0) - AI-powered PPT presentation creator using Google Gemini
 
 This is a **plugin repository**, not an application codebase. Each plugin is self-contained in its own directory with independent versioning and functionality.
+
+## Quick Start
+
+### Installation via Claude Code CLI
+
+```bash
+# Add this marketplace
+/plugin marketplace add https://github.com/jeffkit/jeff-marketplace.git
+
+# Install individual plugins
+/plugin install assistant@jeff-choices
+/plugin install speckit-driver@jeff-choices
+/plugin install nano-ppt@jeff-choices
+```
+
+### Manual Installation
+
+Copy individual plugin directories to `~/.claude/plugins/`:
+
+```bash
+cp -r assistant ~/.claude/plugins/
+cp -r speckit-driver ~/.claude/plugins/
+cp -r nano-ppt ~/.claude/plugins/
+```
+
+### Prerequisites
+
+**For Nano-PPT Plugin:**
+- Google GenAI API key (`GEMINI_API_KEY` environment variable)
+- Python packages: `google-genai`, `Pillow`
+
+**For Assistant Plugin:**
+- Python 3.7+ for CLI scripts
+- No additional dependencies required
+
+**For Speckit Driver Plugin:**
+- No additional dependencies required
+- Designed to work with Claude Code's built-in capabilities
 
 ## Repository Structure
 
@@ -18,7 +56,7 @@ This is a **plugin repository**, not an application codebase. Each plugin is sel
 jeff-marketplace/
 ├── assistant/                    # Personal assistant plugin
 │   ├── .claude-plugin/
-│   │   └── plugin.json          # Plugin metadata (v2.1.0)
+│   │   └── plugin.json          # Plugin metadata (v2.2.0)
 │   └── skills/
 │       └── assistant/
 │           ├── SKILL.md         # Skill documentation
@@ -62,6 +100,9 @@ jeff-marketplace/
 └── .assistant/                   # Assistant data storage (gitignored)
     ├── todos.json               # Persistent TODO storage
     └── journals.json            # Persistent journal storage
+
+├── ppt-output/                   # Nano-PPT generated presentations (gitignored)
+└── .specify/                     # Speckit Driver generated artifacts (gitignored)
 ```
 
 ## Plugin Architecture
@@ -133,7 +174,7 @@ The `speckit-driver` skill acts as project manager, not executor:
 
 ### Nano-PPT Plugin
 
-The Nano-PPT plugin creates professional PPT presentations using Google's Gemini image generation model (gemini-2.5-flash-image).
+The Nano-PPT plugin creates professional PPT presentations using Google's Gemini image generation model (gemini-3-pro-image-preview).
 
 **Workflow Phases:**
 1. **Requirements Gathering** (Phase 1): Conversational interview to understand presentation needs
@@ -200,6 +241,13 @@ python3 ~/.claude/skills/assistant/scripts/todo_manager.py add "Test task" --cat
 # Just trigger the skill with natural language
 ```
 
+**Data Migration (v2.2.0):**
+If upgrading from v2.0.x that stored data in project root:
+```bash
+python3 assistant/skills/assistant/scripts/migrate_data.py
+```
+This moves `todos.json` and `journals.json` to `.assistant/` directory.
+
 ### Testing Speckit Driver Plugin
 
 The speckit-driver plugin is designed to be used through the Claude Code skill system, not as standalone scripts. To test:
@@ -243,14 +291,48 @@ python3 nano-ppt/skills/nano-ppt/scripts/slide_generator.py \
   --reference-image ./test-slide.png
 ```
 
+## Development Workflow
+
+### Making Changes
+
+1. **Plugin Structure**: Each plugin is self-contained with its own versioning
+2. **Version Updates**: Update both `plugin.json` and CLAUDE.md when changing versions
+3. **Testing**: Test plugins locally before committing changes
+4. **Documentation**: Keep README.md files in sync with plugin capabilities
+
+### Testing Changes
+
+**Assistant Plugin Testing:**
+```bash
+# Test CLI operations directly
+python3 assistant/skills/assistant/scripts/todo_manager.py add "Test task" --category work --priority high
+python3 assistant/skills/assistant/scripts/journal_manager.py list --start-date 2025-11-01
+```
+
+**Nano-PPT Plugin Testing:**
+```bash
+# Install dependencies first
+cd nano-ppt && pip install -r requirements.txt
+
+# Test slide generation
+export GEMINI_API_KEY="your-key"
+python3 nano-ppt/skills/nano-ppt/scripts/slide_generator.py "Test slide" ./test.png
+```
+
+**Speckit Driver Testing:**
+- Trigger skill with "用speckit开发" or "Use speckit to develop..."
+- Follow workflow through all phases
+- Check generated artifacts in `.specify/` directory
+
 ### Version Updates
 
 When updating plugin versions:
 
 1. Update `version` field in `.claude-plugin/plugin.json`
 2. Update version in skill's SKILL.md frontmatter (if applicable)
-3. Document changes in CHANGELOG.md (for speckit-driver)
-4. Update README.md to reflect new version number
+3. Update version references in CLAUDE.md (this file)
+4. Document changes in CHANGELOG.md (for speckit-driver)
+5. Update README.md to reflect new version number
 
 ### Plugin Distribution
 

@@ -98,3 +98,4 @@ credentials.json
 
 # Assistant plugin data
 .assistant/
+ppt-output/
