@@ -30,7 +30,7 @@ class SlideGenerator:
             raise ValueError("GEMINI_API_KEY environment variable or api_key parameter is required")
 
         self.client = genai.Client(api_key=self.api_key)
-        self.model = "gemini-2.5-flash-image"
+        self.model = "gemini-3-pro-image-preview"
 
     def generate_slide(
         self,

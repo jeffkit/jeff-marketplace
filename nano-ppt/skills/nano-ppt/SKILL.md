@@ -5,7 +5,7 @@ description: AI-powered PPT presentation creation using Google's Gemini image ge
 
 # Nano-PPT: AI-Powered Presentation Creator
 
-This skill creates professional PPT presentations using Google's Gemini image generation model (gemini-2.5-flash-image, also known as "nano-banana"). It orchestrates the complete workflow from understanding user requirements to generating individual slides as images.
+This skill creates professional PPT presentations using Google's Gemini image generation model (gemini-3-pro-image-preview, also known as "nano-banana"). It orchestrates the complete workflow from understanding user requirements to generating individual slides as images.
 
 ## Prerequisites
 

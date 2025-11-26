@@ -1,7 +1,7 @@
 {
   "name": "nano-ppt",
   "version": "1.0.0",
-  "description": "AI-powered PPT presentation creation using Google's Gemini image generation (gemini-2.5-flash-image)",
+  "description": "AI-powered PPT presentation creation using Google's Gemini image generation (gemini-3-pro-image-preview)",
   "author": {
     "name": "jeffkit",
     "email": "bbmyth@gmail.com"
