@@ -131,16 +131,13 @@ This plugin utilizes a suite of specialized sub-agents:
 Before using this plugin, you need to set up the following:
 
 - **Google GenAI API Key**: Set the `GEMINI_API_KEY` environment variable
-- **Python Dependencies**: Install required packages with `pip install -r nano-ppt/requirements.txt`
 
 ```bash
-# Install dependencies
-cd nano-ppt
-pip install -r requirements.txt
-
 # Set your API key
 export GEMINI_API_KEY="your-google-ai-api-key"
 ```
+
+**Python Dependencies**: The plugin automatically checks and installs required dependencies (`google-genai`, `Pillow`) when needed. No manual installation required.
 
 #### Skills
 

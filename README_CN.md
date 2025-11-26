@@ -130,16 +130,13 @@ python3 assistant/skills/assistant/scripts/migrate_data.py
 使用此插件前，您需要进行以下设置：
 
 - **Google GenAI API 密钥**: 设置 `GEMINI_API_KEY` 环境变量
-- **Python 依赖**: 使用 `pip install -r nano-ppt/requirements.txt` 安装必需的包
 
 ```bash
-# 安装依赖
-cd nano-ppt
-pip install -r requirements.txt
-
 # 设置您的 API 密钥
 export GEMINI_API_KEY="your-google-ai-api-key"
 ```
+
+**Python 依赖**: 插件会在需要时自动检查并安装所需的依赖包（`google-genai`、`Pillow`），无需手动安装。
 
 #### 技能 (Skills)
 

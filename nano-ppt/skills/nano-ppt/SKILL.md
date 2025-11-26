@@ -264,6 +264,8 @@ You are both the **designer** and **orchestrator**:
 2. Check `GEMINI_API_KEY` environment variable is set
 3. Read the detailed outline from disk
 
+**Note**: The slide generation script automatically handles dependency checking and installation when needed. No manual setup required.
+
 **Process** (delegate to sub-agent):
 
 For each slide in the detailed outline, invoke the sub-agent **sequentially**:
@@ -325,8 +327,9 @@ export GEMINI_API_KEY="your-key-here"
 ```
 
 **Import errors**:
+The slide generation script automatically checks and installs dependencies when invoked. If manual intervention is needed:
 ```bash
-# Install required packages
+# Install required packages manually
 pip install google-genai Pillow
 ```
 
@@ -380,6 +383,8 @@ ppt-output/
 3. **Report progress** - Update user after each slide
 4. **Handle errors gracefully** - Retry with adjusted parameters if needed
 5. **Read from detailed-outline.md** - Use the saved file as source of truth
+
+**Note**: The slide generation script automatically handles dependency checking and installation during execution.
 
 ### For Quality Results
 1. **Complete requirements** - Incomplete specs lead to poor results
