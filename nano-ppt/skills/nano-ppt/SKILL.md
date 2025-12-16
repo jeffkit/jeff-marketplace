@@ -27,14 +27,22 @@ pip install google-genai Pillow
 
 The skill follows a structured, phased approach:
 
-**Phase 1: Requirements Gathering** → **Phase 2: Brief Outline** → **Phase 3: Detailed Outline** → **Phase 4: Slide Generation**
+**Phase 0: Template Preparation** → **Phase 1: Requirements Gathering** → **Phase 2: Brief Outline** → **Phase 3: Detailed Outline** → **Phase 4: Slide Generation** → **Phase 5: Incremental Updates** (optional) → **Phase 6: Export** (optional)
 
+- **Phase 0**: Detect or create templates for visual consistency
 - **Phases 1-3**: You execute directly, gathering user feedback and iterating in real-time
 - **Phase 4**: Delegate to sub-agents for parallel/sequential image generation
+- **Phase 5**: Handle post-generation modifications (append, insert, replace slides)
+- **Phase 6**: Export to PPTX or PDF format for distribution
 
 ## Your Role
 
 You are both the **designer** and **orchestrator**:
+
+**Phase 0 (Template Setup)**:
+1. **Check for user templates** - Detect `./ppt-templates/` directory
+2. **Offer template options** - Preset, brand-generated, or skip
+3. **Prepare visual anchors** - Copy templates to output directory
 
 **Phases 1-3 (Design)**:
 1. **Gather requirements** - Interview user conversationally
@@ -48,6 +56,81 @@ You are both the **designer** and **orchestrator**:
 3. **Handle errors** - Retry failed generations with adjusted parameters
 
 ## Detailed Workflow
+
+### Phase 0: Template Preparation
+
+**Objective**: Establish visual anchors for consistent slide generation.
+
+**Four Template Paths**:
+
+#### Path A: User-Provided Templates (Auto-detect)
+
+Check if user has prepared templates in `./ppt-templates/`:
+
+```bash
+ls ./ppt-templates/
+```
+
+**If directory exists with template images:**
+1. List found templates and confirm with user:
+   "I found existing templates in ./ppt-templates/:
+   - cover.png ✓
+   - section.png ✓
+   - content.png ✓
+   - closing.png ✗ (missing)
+   
+   Should I use these templates? For missing types, I can generate them or use alternatives."
+
+2. If user confirms, copy to `./ppt-output/[name]/templates/`
+
+**Template Directory Structure**:
+```
+./ppt-templates/           # User places templates here
+├── cover.png             # Cover slide template [Required]
+├── section.png           # Section divider template [Recommended]
+├── content.png           # Content page template [Required]
+├── data.png              # Data/chart slide template [Optional]
+└── closing.png           # Closing slide template [Recommended]
+```
+
+#### Path B: Preset Templates
+
+If no user templates, offer preset options:
+```
+"Which template style would you like to use?"
+1. business-blue - Professional, clean blue theme
+2. tech-modern - Gradient tech aesthetic
+3. minimal-white - Minimalist with lots of whitespace
+4. warm-corporate - Warm tones, approachable feel
+```
+
+#### Path C: Generate from Brand Reference
+
+If user wants custom templates:
+1. Ask: "Do you have brand reference images? (logo, existing slides, style samples)"
+2. Collect image paths and save to `./ppt-output/[name]/brand-refs/`
+3. Generate 4 template samples: cover, section, content, closing
+4. Present for user approval
+5. Iterate if needed
+
+#### Path D: Skip Templates (Gemini Free-form)
+
+If user chooses to skip:
+1. Mark presentation as "no-template mode"
+2. Slide 1 will be generated purely from text description
+3. Subsequent slides use previous slide as reference
+4. Note: Style consistency depends entirely on prompts
+
+**Save template choice to requirements**:
+```json
+{
+  "template_mode": "user-provided" | "preset" | "brand-generated" | "none",
+  "template_name": "business-blue",  // if preset
+  "templates_path": "./ppt-output/[name]/templates/"
+}
+```
+
+**Proceed to Phase 1** after template setup is complete.
 
 ### Phase 1: Requirements Gathering
 
@@ -128,22 +211,38 @@ You are both the **designer** and **orchestrator**:
    - **Key Message**: ...
    - **Total Slides**: N
    - **Narrative Style**: ...
+   - **Template Mode**: user-provided | preset | brand-generated | none
 
    ## Slide Structure
 
    ### Slide 1: [Title]
+   **Page Type**: COVER
    **Main Idea**: ...
    **Transition**: Opening slide, sets the tone...
 
    ### Slide 2: [Title]
+   **Page Type**: SECTION
    **Main Idea**: ...
-   **Transition**: Builds on Slide 1 by...
+   **Transition**: Introduces first major topic...
+
+   ### Slide 3: [Title]
+   **Page Type**: CONTENT
+   **Main Idea**: ...
+   **Transition**: Builds on previous slide...
 
    ...
 
    ## Narrative Flow Summary
    [2-3 paragraphs describing the overall story arc]
    ```
+
+**Page Types**:
+- `COVER` - Opening/title slide
+- `SECTION` - Chapter/section divider
+- `CONTENT` - Standard content slide
+- `DATA` - Chart/graph focused slide
+- `VISUAL` - Image-heavy slide
+- `CLOSING` - Final/thank you slide
 
 3. **Save to disk**: `./ppt-output/[presentation-name]/brief-outline.md`
 
@@ -263,6 +362,7 @@ You are both the **designer** and **orchestrator**:
 1. Verify output directory exists: `./ppt-output/[presentation-name]/`
 2. Check `GEMINI_API_KEY` environment variable is set
 3. Read the detailed outline from disk
+4. Check template mode from requirements (templates available in `./ppt-output/[name]/templates/`)
 
 **Note**: The slide generation script automatically handles dependency checking and installation when needed. No manual setup required.
 
@@ -276,6 +376,13 @@ Use Task tool with:
 - prompt: Read and follow the instructions in agents/nanoppt-slide-generator.md.
   Generate Slide [N] of [Total].
 
+  Page Type: [COVER | SECTION | CONTENT | DATA | VISUAL | CLOSING]
+
+  Template Info (if using templates):
+  - Template Mode: [user-provided | preset | brand-generated | none]
+  - Template Image: ./ppt-output/[name]/templates/[page-type].png
+  - Template Config: ./ppt-output/[name]/templates/template-config.json
+
   Presentation Context:
   - Topic: [from requirements]
   - Visual Style: [from requirements]
@@ -284,21 +391,24 @@ Use Task tool with:
 
   Previous Slide Summary:
   - Slide [N-1]: [brief description and image path]
-  - Image path: ./ppt-output/[name]/slide_[N-1].png
+  - Image path: ./ppt-output/[name]/slides/slide_[N-1].png
 
   Slide [N] Specifications:
   [Paste the complete slide specifications from detailed-outline.md]
 
-  Output Path: ./ppt-output/[presentation-name]/slide_[NN].png
+  Output Path: ./ppt-output/[presentation-name]/slides/slide_[NN].png
 
-  Reference Image: ./ppt-output/[presentation-name]/slide_[N-1].png
+  Reference Images:
+  - Template: ./ppt-output/[name]/templates/[page-type].png (if available)
+  - Previous Slide: ./ppt-output/[name]/slides/slide_[N-1].png (if not first slide)
 
   Generate this slide and report the result.
 ```
 
 **Key points**:
 - Generate slides **in order** (1, 2, 3, ..., N) for style consistency
-- Each slide (except first) uses previous slide as reference image
+- Pass page-type template as primary visual anchor
+- Each slide (except first) also uses previous slide as reference
 - Report progress after each: "✓ Slide [N]/[Total] generated: [title]"
 - If generation fails, retry with adjusted parameters
 
@@ -312,6 +422,204 @@ Use Task tool with:
 - All slides generated?
 - Visual consistency maintained?
 - Content matches specs?
+
+---
+
+### Phase 5: Incremental Updates (Optional)
+
+**Objective**: Modify existing presentations by adding, inserting, or replacing slides.
+
+**Trigger**: User requests changes to an already-generated presentation.
+
+#### 5.1 Requirements Gathering
+
+**Agent asks clarifying questions**:
+
+1. **What type of change?**
+   - Add new content
+   - Modify existing slide
+   - Reorganize/move slides
+
+2. **What is the content?**
+   - What topic/information should the new slide cover?
+   - What's the main message?
+
+3. **Where should it go?** (if adding)
+   - After Slide X (insert)
+   - At the end (append)
+   - Replace Slide X (replacement)
+
+#### 5.2 Draft New Slide Outline
+
+**Agent creates outline for user approval**:
+
+```markdown
+## New Slide: [Title]
+
+**Operation**: Insert after Slide 5 (becomes new Slide 6)
+
+### Brief Outline
+- **Page Type**: CONTENT
+- **Main Idea**: [2-3 sentences]
+- **Transition from Previous**: [connection to Slide 5]
+- **Transition to Next**: [connection to current Slide 6]
+
+### Detailed Specification
+**Content Specifications**:
+- Slide Title: ...
+- Text Content: ...
+
+**Visual Specifications**:
+- Layout: ...
+- Style: Match existing slides
+- Reference: Use slide_05.png for style consistency
+```
+
+#### 5.3 User Confirmation
+
+Present draft to user and wait for:
+- Approval to proceed
+- Requests for adjustments
+- Cancellation
+
+**Only proceed after explicit user confirmation.**
+
+#### 5.4 Determine Operation Type
+
+Agent automatically determines operation based on user input:
+
+| User Request | Operation Type | File Handling |
+|--------------|----------------|---------------|
+| "Add at the end" | **APPEND** | Create slide_N+1.png |
+| "Add after Slide X" | **INSERT** | Rename X+1~end, then create new X+1 |
+| "Replace Slide X" | **REPLACE** | Delete old, regenerate slide_X.png |
+| "Modify Slide X content" | **REPLACE** | Same as replace |
+
+#### 5.5 Execute Update
+
+**For APPEND operation**:
+1. Update `detailed-outline.md` - add new slide at end
+2. Generate new slide using last slide as reference:
+   ```bash
+   python3 scripts/slide_generator.py \
+     "[prompt]" \
+     "./slides/slide_16.png" \
+     --reference-image "./slides/slide_15.png" \
+     --page-type [type]
+   ```
+
+**For INSERT operation**:
+1. Update `detailed-outline.md` - insert new slide spec at position
+2. Rename existing files (shift forward):
+   ```bash
+   # Example: Insert after Slide 5
+   # Move slide_06.png → slide_07.png, etc.
+   for i in $(seq [TOTAL] -1 [INSERT_POS+1]); do
+     mv slides/slide_$(printf "%02d" $i).png \
+        slides/slide_$(printf "%02d" $((i+1))).png
+   done
+   ```
+3. Generate new slide using previous slide as reference
+4. **Optional**: Regenerate next slide if transition context changed significantly
+
+**For REPLACE operation**:
+1. Update `detailed-outline.md` - modify existing slide spec
+2. **Backup or keep old slide as reference** (default behavior for style consistency)
+3. Regenerate slide using:
+   - **Default**: Old slide (`slide_N.png.bak` or in-memory) as primary reference
+   - **Optional**: User can specify `--no-reference` to generate fresh style
+   - Also use previous slide (`slide_N-1.png`) for context continuity
+4. Delete backup after successful generation
+5. **Optional**: Regenerate next slide if content changed significantly
+
+> **Note**: Using old slide as reference ensures the new slide maintains the same visual template. User can explicitly request fresh generation if they want a different look.
+
+#### 5.6 Post-Update Verification
+
+- Confirm new/updated slide generated
+- Check file naming is sequential
+- Verify style consistency with neighbors
+- Report completion to user
+
+**Example interaction**:
+```
+User: "我想在 Slide 5 之后加一张关于技术债务的内容"
+
+Agent: "好的，我来为您起草这张新幻灯片的内容：
+
+## 新增幻灯片草案
+
+**插入位置**: Slide 5 之后 (成为新的 Slide 6)
+**Page Type**: CONTENT
+**标题**: 技术债务的隐性成本
+**主要内容**: ...
+
+请确认这个内容，或告诉我需要调整的地方。"
+
+User: "确认"
+
+Agent: [执行 INSERT 操作]
+"✓ 已在 Slide 5 后插入新幻灯片
+ - 原 Slide 6-15 已重命名为 Slide 7-16
+ - 新 Slide 6 已生成: slide_06.png"
+```
+
+---
+
+### Phase 6: Export (Optional)
+
+**Objective**: Convert generated slide images to shareable formats (PPTX, PDF).
+
+**Available Formats**:
+- **PPTX** - Editable PowerPoint format (recommended for further editing)
+- **PDF** - Static document format (recommended for distribution)
+
+#### 6.1 Export to PPTX
+
+```bash
+python3 scripts/export_slides.py \
+  "./ppt-output/[presentation-name]/slides" \
+  --format pptx \
+  --aspect-ratio "16:9"
+```
+
+**Output**: `./ppt-output/[presentation-name]/[presentation-name].pptx`
+
+#### 6.2 Export to PDF
+
+```bash
+python3 scripts/export_slides.py \
+  "./ppt-output/[presentation-name]/slides" \
+  --format pdf
+```
+
+**Output**: `./ppt-output/[presentation-name]/[presentation-name].pdf`
+
+#### 6.3 Export to Both Formats
+
+```bash
+python3 scripts/export_slides.py \
+  "./ppt-output/[presentation-name]/slides" \
+  --format both
+```
+
+#### 6.4 Custom Output Path
+
+```bash
+python3 scripts/export_slides.py \
+  "./ppt-output/agent-skills-intro/slides" \
+  "./output/my-presentation.pptx" \
+  --format pptx
+```
+
+#### 6.5 Dependencies
+
+First-time setup:
+```bash
+python3 scripts/export_slides.py --check-deps
+```
+
+Required packages: `python-pptx`, `Pillow`, `img2pdf`
 
 ## Error Handling
 

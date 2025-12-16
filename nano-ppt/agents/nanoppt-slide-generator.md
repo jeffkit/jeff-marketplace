@@ -79,12 +79,38 @@ Next Slide Preview: [Brief mention of what's coming next]
 
 Execute the slide generation using the Python script:
 
+**With Template (Recommended)**:
 ```bash
 python3 scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
   --aspect-ratio "[aspect_ratio]" \
+  --page-type "[cover|section|content|data|visual|closing]" \
+  --template "[template_image_path]" \
+  --template-config "[template_config_json_path]" \
   --reference-image "[previous_slide_image_path]" \
+  --context '[context_json]'
+```
+
+**Without Template (Free-form)**:
+```bash
+python3 scripts/slide_generator.py \
+  "[Your comprehensive prompt]" \
+  "[output_path]" \
+  --aspect-ratio "[aspect_ratio]" \
+  --page-type "[cover|section|content|data|visual|closing]" \
+  --reference-image "[previous_slide_image_path]" \
+  --context '[context_json]'
+```
+
+**With Multiple Brand Reference Images**:
+```bash
+python3 scripts/slide_generator.py \
+  "[Your comprehensive prompt]" \
+  "[output_path]" \
+  --aspect-ratio "[aspect_ratio]" \
+  --page-type "[cover|section|content|data|visual|closing]" \
+  --reference-images "[brand_ref_1.png]" "[brand_ref_2.png]" \
   --context '[context_json]'
 ```
 
@@ -112,16 +138,37 @@ After generation:
 
 ### For Style Consistency
 
-**When generating Slide 1** (no reference):
+**When generating Slide 1 WITH template**:
+- Use `--template` to pass the cover template image
+- Template serves as the primary visual anchor
+- Still be specific about content placement
+- Example:
+```bash
+python3 scripts/slide_generator.py \
+  "Create a cover slide with title 'AI领导力' centered, subtitle '2024年度演讲' below" \
+  "./output/slide_01.png" \
+  --page-type cover \
+  --template "./templates/cover.png"
+```
+
+**When generating Slide 1 WITHOUT template** (free-form):
 - Establish a strong visual style foundation
 - Be very specific about colors, typography, layout
 - Create distinctive design elements that can be referenced later
 
-**When generating Slides 2+** (with reference):
-- Start prompt with style consistency instruction
-- Include reference image path
-- Emphasize maintaining established visual language
-- Reference specific elements from previous slide
+**When generating Slides 2+ WITH template**:
+- Pass both template and previous slide as references
+- Template ensures page-type layout consistency
+- Previous slide ensures cross-slide style continuity
+- Example:
+```bash
+python3 scripts/slide_generator.py \
+  "Create a content slide about 'Key Findings'" \
+  "./output/slide_03.png" \
+  --page-type content \
+  --template "./templates/content.png" \
+  --reference-image "./output/slide_02.png"
+```
 
 ### For Content Clarity
 
