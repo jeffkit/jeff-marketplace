@@ -1,0 +1,46 @@
+{
+  "presentation_name": "ai-leadership-2.0",
+  "overview": {
+    "title": "AI领导力2.0：突破超级个体的心力瓶颈",
+    "target_audience": "混合听众（技术从业者、企业管理层、AI爱好者）",
+    "primary_goal": "传递AI领导力从1.0到2.0的进化理念，帮助听众理解三级协作架构，掌握突破个人心力瓶颈的方法论",
+    "delivery_context": "行业峰会演讲，45-60分钟深度讲解版",
+    "tone": "洞察深刻、启发性强、前瞻性、专业但易懂"
+  },
+  "content_requirements": {
+    "key_topics": [
+      "AI领导力1.0回顾与成就",
+      "超级个体面临的心力瓶颈",
+      "AI领导力2.0核心理念",
+      "三级协作架构设计（人类→中层AI→一线AI）",
+      "中层Agent的实现方法与能力设计",
+      "从管理者到总设计师的角色转变",
+      "AI领导力的终极形态与未来展望"
+    ],
+    "technical_specs": "深度讲解但保持易懂，需要架构图、对比分析，避免过多代码细节",
+    "comparisons": "必须包含AI领导力1.0 vs 2.0的对比分析",
+    "call_to_action": "启发听众思考如何在自己的实践中应用AI领导力2.0，从AI管理者进化为AI组织总设计师"
+  },
+  "style_requirements": {
+    "visual_style": "科技感强、未来感强，使用渐变色彩、现代几何图形、数据可视化元素",
+    "color_preferences": "蓝色/紫色/青色渐变为主色调，深色背景，高对比度文字",
+    "aspect_ratio": "16:9",
+    "branding": "无特定品牌要求，保持简洁现代"
+  },
+  "structural_requirements": {
+    "slide_count": "20-30张",
+    "must_have_slides": [
+      "COVER",
+      "OVERVIEW/AGENDA",
+      "1.0回顾（成就与瓶颈）",
+      "2.0核心理念",
+      "三层架构设计（带架构图）",
+      "中层Agent设计详解",
+      "对比分析（1.0 vs 2.0）",
+      "实现方法与案例",
+      "未来展望",
+      "CLOSING"
+    ],
+    "organization_notes": "采用渐进式叙事：从问题引入→理念升级→架构设计→实现方法→未来展望，保持逻辑连贯"
+  }
+}

@@ -97,6 +97,7 @@ class SlideGenerator:
         prompt: str,
         output_path: str,
         aspect_ratio: str = "16:9",
+        image_size: str = "2K",
         reference_image: Optional[str] = None,
         reference_images: Optional[List[str]] = None,
         template: Optional[str] = None,
@@ -111,6 +112,10 @@ class SlideGenerator:
             prompt: Text description of the slide content
             output_path: Path to save the generated image
             aspect_ratio: Image aspect ratio (default: 16:9)
+                Supported: "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"
+            image_size: Output image resolution (default: 1K)
+                Supported: "1K" (1024px), "2K" (2048px), "4K" (4096px)
+                Note: Must use uppercase 'K' (e.g., "2K" not "2k")
             reference_image: Optional path to single reference image (legacy support)
             reference_images: Optional list of paths to reference images (brand refs, etc.)
             template: Optional path to template image for this page type
@@ -167,6 +172,7 @@ class SlideGenerator:
                     response_modalities=["IMAGE"],
                     image_config=types.ImageConfig(
                         aspect_ratio=aspect_ratio,
+                        image_size=image_size,
                     ),
                 ),
             )
@@ -302,8 +308,14 @@ def main():
     parser.add_argument(
         "--aspect-ratio",
         default="16:9",
-        choices=["16:9", "9:16", "4:3", "3:4", "1:1"],
+        choices=["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"],
         help="Slide aspect ratio (default: 16:9)"
+    )
+    parser.add_argument(
+        "--image-size",
+        default="2K",
+        choices=["1K", "2K", "4K"],
+        help="Output image resolution: 1K (1024px), 2K (2048px, default), 4K (4096px). Must use uppercase K."
     )
     parser.add_argument(
         "--reference-image",
@@ -383,6 +395,7 @@ def main():
             prompt=args.prompt,
             output_path=args.output,
             aspect_ratio=args.aspect_ratio,
+            image_size=args.image_size,
             reference_image=args.reference_image,
             reference_images=args.reference_images,
             template=args.template,

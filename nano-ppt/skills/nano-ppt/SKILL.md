@@ -411,12 +411,23 @@ Overall Mood: [Design notes from specifications]
 
 #### Step 2: Call the Slide Generator Script
 
+**Script Parameters**:
+| Parameter | Description | Values |
+|-----------|-------------|--------|
+| `--aspect-ratio` | Image aspect ratio | `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9` (default), `21:9` |
+| `--image-size` | Output resolution | `1K` (1024px), `2K` (2048px, default), `4K` (4096px). **Must use uppercase K.** |
+| `--page-type` | Slide type | `cover`, `section`, `content`, `data`, `visual`, `closing` |
+| `--template` | Template image path | Path to page-type template |
+| `--reference-image` | Previous slide path | Path to previous slide for style consistency |
+| `--context` | Context JSON | JSON string or file path with presentation context |
+
 **With Template (Recommended)**:
 ```bash
 python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
-  --aspect-ratio "[aspect_ratio]" \
+  --aspect-ratio "16:9" \
+  --image-size "2K" \
   --page-type "[cover|section|content|data|visual|closing]" \
   --template "[template_image_path]" \
   --reference-image "[previous_slide_image_path]" \
@@ -428,7 +439,8 @@ python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
 python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
-  --aspect-ratio "[aspect_ratio]" \
+  --aspect-ratio "16:9" \
+  --image-size "2K" \
   --page-type "[cover|section|content|data|visual|closing]" \
   --reference-image "[previous_slide_image_path]" \
   --context '[context_json]'

@@ -184,13 +184,24 @@ nano-ppt/
 
 ## Configuration
 
+### Image Resolution
+
+Output image resolution (requires `gemini-3-pro-image-preview` model):
+- `1K` - 1024x1024 pixels
+- `2K` - 2048x2048 pixels (default)
+- `4K` - 4096x4096 pixels
+
+> **Note**: Must use uppercase 'K' (e.g., `2K` not `2k`).
+
 ### Aspect Ratios
 
 Default is 16:9, but you can specify:
-- `16:9` - Widescreen (default)
-- `4:3` - Standard
-- `9:16` - Portrait
 - `1:1` - Square
+- `2:3`, `3:2` - Portrait/Landscape
+- `3:4`, `4:3` - Standard
+- `4:5`, `5:4` - Photo
+- `9:16`, `16:9` - Widescreen (default)
+- `21:9` - Ultra-wide
 
 ### Output Directory
 
