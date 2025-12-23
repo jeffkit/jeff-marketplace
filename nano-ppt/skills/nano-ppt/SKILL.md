@@ -30,8 +30,7 @@ The skill follows a structured, phased approach:
 **Phase 0: Template Preparation** → **Phase 1: Requirements Gathering** → **Phase 2: Brief Outline** → **Phase 3: Detailed Outline** → **Phase 4: Slide Generation** → **Phase 5: Incremental Updates** (optional) → **Phase 6: Export** (optional)
 
 - **Phase 0**: Detect or create templates for visual consistency
-- **Phases 1-3**: You execute directly, gathering user feedback and iterating in real-time
-- **Phase 4**: Delegate to sub-agents for parallel/sequential image generation
+- **Phases 1-4**: You execute directly, generating slides sequentially
 - **Phase 5**: Handle post-generation modifications (append, insert, replace slides)
 - **Phase 6**: Export to PPTX or PDF format for distribution
 
@@ -51,7 +50,7 @@ You are both the **designer** and **orchestrator**:
 4. **Save artifacts** - Write all intermediate files to disk for user review/editing
 
 **Phase 4 (Generation)**:
-1. **Delegate to sub-agents** - Use Task tool for slide generation
+1. **Generate slides directly** - Call Python script for each slide sequentially
 2. **Track progress** - Report status after each slide
 3. **Handle errors** - Retry failed generations with adjusted parameters
 
@@ -359,66 +358,122 @@ If user chooses to skip:
 **Objective**: Generate each slide as an image file using Google's Gemini model.
 
 **Setup**:
-1. Verify output directory exists: `./ppt-output/[presentation-name]/`
+1. Verify output directory exists: `./ppt-output/[presentation-name]/slides/`
 2. Check `GEMINI_API_KEY` environment variable is set
 3. Read the detailed outline from disk
 4. Check template mode from requirements (templates available in `./ppt-output/[name]/templates/`)
 
-**Note**: The slide generation script automatically handles dependency checking and installation when needed. No manual setup required.
+**Script Location**:
 
-**Process** (delegate to sub-agent):
+> **IMPORTANT**: The script is located at:
+> `~/.claude/skills/nano-ppt/scripts/slide_generator.py`
 
-For each slide in the detailed outline, invoke the sub-agent **sequentially**:
+**Process** (you execute this directly):
 
+For each slide in the detailed outline, generate **sequentially** (1, 2, 3, ..., N):
+
+#### Step 1: Build the Generation Prompt
+
+For each slide, construct a comprehensive prompt:
+
+**Style Consistency Instructions** (if not first slide):
 ```
-Use Task tool with:
-- subagent_type: "nano-ppt:nanoppt-slide-generator"
-- prompt: Read and follow the instructions in agents/nanoppt-slide-generator.md.
-  Generate Slide [N] of [Total].
-
-  Page Type: [COVER | SECTION | CONTENT | DATA | VISUAL | CLOSING]
-
-  Template Info (if using templates):
-  - Template Mode: [user-provided | preset | brand-generated | none]
-  - Template Image: ./ppt-output/[name]/templates/[page-type].png
-  - Template Config: ./ppt-output/[name]/templates/template-config.json
-
-  Presentation Context:
-  - Topic: [from requirements]
-  - Visual Style: [from requirements]
-  - Color Scheme: [from requirements]
-  - Aspect Ratio: [from requirements]
-
-  Previous Slide Summary:
-  - Slide [N-1]: [brief description and image path]
-  - Image path: ./ppt-output/[name]/slides/slide_[N-1].png
-
-  Slide [N] Specifications:
-  [Paste the complete slide specifications from detailed-outline.md]
-
-  Output Path: ./ppt-output/[presentation-name]/slides/slide_[NN].png
-
-  Reference Images:
-  - Template: ./ppt-output/[name]/templates/[page-type].png (if available)
-  - Previous Slide: ./ppt-output/[name]/slides/slide_[N-1].png (if not first slide)
-
-  Generate this slide and report the result.
+Maintain the same visual style, color scheme, typography, and design aesthetic as the reference image. Use consistent:
+- Color palette and gradients
+- Visual treatment and effects
+- Layout principles and spacing
+- Design elements and patterns
 ```
 
-**Key points**:
+**Slide Content Requirements**:
+```
+Create a professional presentation slide for: [Slide Title]
+
+Aspect Ratio: [16:9 / 4:3 / etc.]
+
+Layout: [Layout type from specifications]
+
+Content to Include:
+[Exact text content from specifications]
+
+Visual Requirements:
+- Subject: [What to depict]
+- Style: [Visual style]
+- Composition: [How to arrange]
+- Specific Elements: [Must-include elements]
+- Color Emphasis: [Colors to use]
+
+Typography:
+[Font size and formatting guidance]
+
+Overall Mood: [Design notes from specifications]
+```
+
+#### Step 2: Call the Slide Generator Script
+
+**With Template (Recommended)**:
+```bash
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
+  "[Your comprehensive prompt]" \
+  "[output_path]" \
+  --aspect-ratio "[aspect_ratio]" \
+  --page-type "[cover|section|content|data|visual|closing]" \
+  --template "[template_image_path]" \
+  --reference-image "[previous_slide_image_path]" \
+  --context '[context_json]'
+```
+
+**Without Template (Free-form)**:
+```bash
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
+  "[Your comprehensive prompt]" \
+  "[output_path]" \
+  --aspect-ratio "[aspect_ratio]" \
+  --page-type "[cover|section|content|data|visual|closing]" \
+  --reference-image "[previous_slide_image_path]" \
+  --context '[context_json]'
+```
+
+**Context JSON Structure**:
+```json
+{
+  "ppt_overview": "Overall presentation theme and key message",
+  "slide_title": "Current slide title",
+  "slide_main_idea": "Main idea to convey",
+  "previous_slide": "Summary of previous slide content",
+  "next_slide": "Preview of next slide content",
+  "style_requirements": "Visual style, colors, and design consistency notes"
+}
+```
+
+#### Step 3: Verify and Report Progress
+
+After each slide:
+1. Confirm the image was created successfully
+2. Report progress: "✓ Slide [N]/[Total] generated: [title]"
+3. If generation fails, retry with adjusted parameters
+
+**Prompt Engineering Tips**:
+
+- **Slide 1 WITH template**: Use `--template` to pass cover template as visual anchor
+- **Slide 1 WITHOUT template**: Be very specific about colors, typography, layout to establish style
+- **Slides 2+**: Always pass previous slide as `--reference-image` for style consistency
+- **Text-heavy slides**: Specify exact text placement and hierarchy
+- **Data slides**: Describe chart type clearly, specify data labels and values
+
+**Key Points**:
 - Generate slides **in order** (1, 2, 3, ..., N) for style consistency
-- Pass page-type template as primary visual anchor
-- Each slide (except first) also uses previous slide as reference
+- Pass page-type template as primary visual anchor (if using templates)
+- Each slide (except first) uses previous slide as reference
 - Report progress after each: "✓ Slide [N]/[Total] generated: [title]"
-- If generation fails, retry with adjusted parameters
 
-**Final output**:
-- Slide images: `./ppt-output/[presentation-name]/slide_01.png`, `slide_02.png`, etc.
+**Final Output**:
+- Slide images: `./ppt-output/[presentation-name]/slides/slide_01.png`, `slide_02.png`, etc.
 - Requirements: `./ppt-output/[presentation-name]/requirements.json`
 - Brief outline: `./ppt-output/[presentation-name]/brief-outline.md`
 - Detailed outline: `./ppt-output/[presentation-name]/detailed-outline.md`
 
-**Quality checks**:
+**Quality Checks**:
 - All slides generated?
 - Visual consistency maintained?
 - Content matches specs?
@@ -642,7 +697,7 @@ pip install google-genai Pillow
 ```
 
 **Generation failures**:
-- Review error message from sub-agent
+- Review error message from script
 - Check API quota and rate limits
 - Verify prompt isn't too long
 - Try simplifying visual requirements
@@ -685,7 +740,7 @@ ppt-output/
 4. **Iterate quickly** - Direct feedback loop, no agent overhead
 5. **Check for edits** - Read files from disk before next phase (user may have edited)
 
-### Phase 4 (Generation - Delegate to Sub-agents)
+### Phase 4 (Generation - You Execute)
 1. **Generate sequentially** - Always in order (1, 2, 3, ..., N)
 2. **Pass reference images** - Each slide uses previous as style reference
 3. **Report progress** - Update user after each slide
@@ -742,7 +797,7 @@ ppt-output/
 
 **You**: "Starting generation..."
 
-[You invoke sub-agent for each slide]
+[You call script for each slide]
 
 **You**: "✓ Slide 1/12 generated: Q4 Marketing Results"
 **You**: "✓ Slide 2/12 generated: Executive Summary"
@@ -819,11 +874,11 @@ ppt-output/
 4. Get user approval before proceeding
 5. Check for user edits before next phase
 
-**Phase 4 (Delegate to sub-agent)**:
+**Phase 4 (You execute)**:
 1. Read detailed-outline.md from disk
-2. Invoke sub-agent for each slide sequentially
+2. Call slide generator script for each slide sequentially
 3. Pass reference images for consistency
 4. Report progress to user
 5. Handle errors and retry if needed
 
-**Remember**: Phases 1-3 are interactive design work you do directly. Phase 4 is bulk generation you delegate to sub-agents.
+**Remember**: All phases (1-4) are executed directly by you. No sub-agents are used.

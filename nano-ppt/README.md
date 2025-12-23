@@ -17,7 +17,7 @@ The Nano-PPT plugin enables Claude Code to create professional PowerPoint presen
 - 🔄 **Visual Consistency** - Maintains coherent style across all slides using reference images
 - 📊 **Structured Workflow** - Guided process from requirements to final slides
 - ✅ **User Approval Gates** - Review and approve at each phase
-- 🎯 **Specialized Agents** - Dedicated sub-agents for each workflow phase
+- 🎯 **Structured Workflow** - Phased approach from requirements to final slides
 - 🌐 **Bilingual Support** - Works in English and Chinese
 
 ## Installation
@@ -156,7 +156,7 @@ The main skill agent expands to:
 
 ### Phase 4: Slide Generation
 
-The `nanoppt-slide-generator` sub-agent generates each slide:
+The main skill agent generates each slide:
 - Creates images using Google Gemini
 - Maintains visual consistency via reference images
 - Follows detailed specifications
@@ -170,11 +170,9 @@ The `nanoppt-slide-generator` sub-agent generates each slide:
 nano-ppt/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin metadata
-├── agents/
-│   └── nanoppt-slide-generator.md   # Slide generation sub-agent
 ├── skills/
 │   └── nano-ppt/
-│       ├── SKILL.md                 # Main orchestrator skill
+│       ├── SKILL.md                 # Main skill (all phases)
 │       └── scripts/
 │           ├── slide_generator.py   # Python script for image generation
 │           └── export_slides.py     # Export to PPTX/PDF
@@ -182,7 +180,7 @@ nano-ppt/
 └── README.md                    # This file
 ```
 
-> **Note**: Phases 1-3 (requirements, brief outline, detailed outline) are executed directly by the main skill agent. Only Phase 4 (slide generation) uses a dedicated sub-agent.
+> **Note**: All phases (1-4) are executed directly by the main skill agent. No sub-agents are used.
 
 ## Configuration
 
@@ -252,7 +250,7 @@ pip install --upgrade google-genai Pillow
 - Four-phase workflow (requirements → brief → detailed → generation)
 - Google Gemini integration for image generation
 - Visual consistency via reference images
-- Specialized sub-agents for each phase
+- Structured phased workflow
 - Bilingual support (English/Chinese)
 
 ## Credits
