@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(assistant)",
+      "Skill(speckit-driver)",
+      "Skill(nano-ppt)",
+      "Skill(skill-creator)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

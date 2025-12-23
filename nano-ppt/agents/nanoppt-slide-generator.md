@@ -77,11 +77,14 @@ Next Slide Preview: [Brief mention of what's coming next]
 
 ### 3. Call Slide Generator Script
 
-Execute the slide generation using the Python script:
+Execute the slide generation using the Python script.
+
+> **IMPORTANT**: The script is located in the skills installation directory. Use the absolute path:
+> `~/.claude/skills/nano-ppt/scripts/slide_generator.py`
 
 **With Template (Recommended)**:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
   --aspect-ratio "[aspect_ratio]" \
@@ -94,7 +97,7 @@ python3 scripts/slide_generator.py \
 
 **Without Template (Free-form)**:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
   --aspect-ratio "[aspect_ratio]" \
@@ -105,7 +108,7 @@ python3 scripts/slide_generator.py \
 
 **With Multiple Brand Reference Images**:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "[Your comprehensive prompt]" \
   "[output_path]" \
   --aspect-ratio "[aspect_ratio]" \
@@ -144,7 +147,7 @@ After generation:
 - Still be specific about content placement
 - Example:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "Create a cover slide with title 'AI领导力' centered, subtitle '2024年度演讲' below" \
   "./output/slide_01.png" \
   --page-type cover \
@@ -162,7 +165,7 @@ python3 scripts/slide_generator.py \
 - Previous slide ensures cross-slide style continuity
 - Example:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "Create a content slide about 'Key Findings'" \
   "./output/slide_03.png" \
   --page-type content \
@@ -258,7 +261,7 @@ Narrative Connection: This slide validates the success claims with concrete data
 
 **Step 3 - Execute Generation**:
 ```bash
-python3 scripts/slide_generator.py \
+python3 ~/.claude/skills/nano-ppt/scripts/slide_generator.py \
   "Maintain the same visual style, color scheme, typography, and design aesthetic as the reference image.
 
 Create a professional presentation slide:

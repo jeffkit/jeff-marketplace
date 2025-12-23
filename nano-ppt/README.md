@@ -126,37 +126,37 @@ All done! Your presentation is ready in ./ppt-output/q4-marketing-results/
 
 ### Phase 1: Requirements Gathering
 
-The `nanoppt-requirements` agent conducts a conversational interview to understand:
+The main skill agent conducts a conversational interview to understand:
 - Presentation topic and purpose
 - Target audience
 - Content requirements
 - Style and visual preferences
 - Technical specifications
 
-**Output**: JSON requirements document
+**Output**: `requirements.json` saved to `./ppt-output/[name]/`
 
 ### Phase 2: Brief Outline
 
-The `nanoppt-brief-outline` agent creates:
+The main skill agent creates:
 - Slide titles and main ideas
 - Transition relationships between slides
 - Overall narrative flow
 
-**Output**: Markdown brief outline
+**Output**: `brief-outline.md` saved to `./ppt-output/[name]/`
 
 ### Phase 3: Detailed Outline
 
-The `nanoppt-detailed-outline` agent expands to:
+The main skill agent expands to:
 - Complete content specifications
 - Visual requirements and layout
 - Design consistency guidelines
 - Production notes
 
-**Output**: Markdown detailed outline
+**Output**: `detailed-outline.md` saved to `./ppt-output/[name]/`
 
 ### Phase 4: Slide Generation
 
-The `nanoppt-slide-generator` agent generates each slide:
+The `nanoppt-slide-generator` sub-agent generates each slide:
 - Creates images using Google Gemini
 - Maintains visual consistency via reference images
 - Follows detailed specifications
@@ -171,18 +171,18 @@ nano-ppt/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin metadata
 ├── agents/
-│   ├── nanoppt-requirements.md      # Requirements gathering agent
-│   ├── nanoppt-brief-outline.md     # Brief outline creator
-│   ├── nanoppt-detailed-outline.md  # Detailed outline creator
-│   └── nanoppt-slide-generator.md   # Slide generation agent
+│   └── nanoppt-slide-generator.md   # Slide generation sub-agent
 ├── skills/
 │   └── nano-ppt/
 │       ├── SKILL.md                 # Main orchestrator skill
 │       └── scripts/
-│           └── slide_generator.py   # Python script for image generation
+│           ├── slide_generator.py   # Python script for image generation
+│           └── export_slides.py     # Export to PPTX/PDF
 ├── requirements.txt             # Python dependencies
 └── README.md                    # This file
 ```
+
+> **Note**: Phases 1-3 (requirements, brief outline, detailed outline) are executed directly by the main skill agent. Only Phase 4 (slide generation) uses a dedicated sub-agent.
 
 ## Configuration
 
