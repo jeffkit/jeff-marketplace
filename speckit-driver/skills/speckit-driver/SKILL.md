@@ -1,6 +1,6 @@
 ---
 skill_name: speckit-driver
-version: 1.1.1
+version: 1.2.0
 description: Autonomous Spec-Driven Development orchestrator for Claude Code. Use this skill when users want to build features or projects using speckit methodology. This skill enables Claude to intelligently drive the entire speckit workflow (constitution → specify → clarify → checklist → plan → tasks → analyze → implement) with minimal user intervention, using sub-agents for execution while the main agent acts as project manager. Enhanced with quality gates: clarification, checklist generation, and cross-artifact analysis. Triggers include phrases like "用speckit开发", "帮我用规范驱动开发", "使用speckit构建", or when systematic spec-driven development is needed.
 triggers:
   - "用speckit开发"
@@ -71,52 +71,153 @@ You have access to these specialized sub-agents via the Task tool:
 
 **When to run**: First time in a project, or when user explicitly requests constitution update
 
-**Your responsibilities**:
+> ⚠️ **CRITICAL: Constitution is about HOW you build, NOT WHAT you build.**
+> 
+> The Constitution defines **project-wide principles** that apply to ALL features.
+> It is NOT for describing specific feature requirements - those go into Specifications.
+
+#### Constitution vs Specification - Critical Distinction
+
+**Before gathering constitution input, you MUST understand this distinction:**
+
+| Belongs in Constitution ✅ | Belongs in Specification ❌ |
+|---------------------------|----------------------------|
+| Development standards and coding conventions | Specific feature requirements |
+| Testing philosophy and coverage requirements | User stories and use cases |
+| Architecture patterns and constraints | Data models for specific features |
+| Security and compliance requirements | API endpoints for specific features |
+| Performance baselines (e.g., "API < 200ms") | UI/UX flows for specific features |
+| Technology constraints for ALL features | Business logic rules for a feature |
+| Accessibility standards | Feature-specific validation rules |
+
+**The Litmus Test**: Ask yourself - "Does this apply to EVERY feature in the project?"
+- If **YES** → Constitution
+- If **NO** → Specification or Plan
+
+**Common Mistakes to Avoid:**
+
+| ❌ WRONG (in Constitution) | ✅ RIGHT (in Constitution) |
+|---------------------------|---------------------------|
+| "Photos should be grouped by date" | "All data must be stored locally" |
+| "Users can drag-drop to reorganize" | "UI must meet WCAG 2.1 AA standards" |
+| "Tasks have priority and status" | "All features must have 80%+ test coverage" |
+| "Display albums in a grid layout" | "API responses must complete within 200ms" |
+| "Support JPG, PNG, GIF formats" | "All user input must be validated and sanitized" |
+
+#### Your Responsibilities
+
 1. Check if `.specify/memory/constitution.md` exists
-2. If not exists or user requests update, engage with user about project principles:
-   - What are the non-negotiable principles for this project?
-   - What development standards must be followed?
-   - What are the key constraints (security, performance, accessibility, etc.)?
-   - How many principles should be defined? (suggest 5-7 as default)
-3. Guide the user through defining high-quality principles:
+2. If not exists or user requests update, **clearly separate the conversation**:
+   - **First**: Ask about PROJECT-WIDE principles (for Constitution)
+   - **Then**: Ask about the SPECIFIC FEATURE (for Specification)
+3. Guide the user through defining high-quality **project-wide** principles:
    - Each principle should be specific and actionable
-   - Avoid vague language
+   - Each principle should apply to ALL features, not just one
+   - Avoid feature-specific requirements
    - Include rationale for why each principle matters
-   - Provide examples of good principles if user needs help
-4. Once you have gathered sufficient input, invoke the **speckit-constitution** sub-agent with the user's principle requirements
+4. Only invoke **speckit-constitution** sub-agent with project-wide principles
+
+**What makes a good Constitution principle:**
+- ✅ Specific and measurable (e.g., "80% test coverage" not "good testing")
+- ✅ Applies to every feature in the project
+- ✅ Focuses on HOW to build, not WHAT to build
+- ✅ Includes clear rationale
 
 **Example interaction**:
 ```
-User: I want to build a new feature using speckit
+User: I want to build a photo album app using speckit
 
-You: I'll help you build this feature using the speckit workflow. First, let me check if we have a project constitution...
+You: I'll help you build this using the speckit workflow. First, let me check if we have a project constitution...
 
 [Check for .specify/memory/constitution.md]
 
-I don't see an existing constitution for this project. Before we start building features, let's establish the foundational principles that will guide all development.
+I don't see an existing constitution for this project. Before we start building the photo album feature, let's establish the foundational **project-wide** principles.
 
-A good constitution typically includes 5-7 core principles. Here are some examples:
-- Security: All user data must be encrypted at rest and in transit
-- Performance: API responses must complete within 200ms for 95th percentile
-- Accessibility: All UI must meet WCAG 2.1 AA standards
-- Testing: All features must have 80%+ test coverage
+⚠️ **Important distinction:**
+- **Constitution** = rules for HOW we build (applies to ALL features)
+- **Specification** = WHAT we're building (specific to photo album feature)
 
-What are the most important principles for your project? Please describe:
-1. The type of project (web app, CLI tool, library, etc.)
-2. Key quality requirements (security, performance, usability, etc.)
-3. Any specific constraints or standards you must follow
+Let me first ask about your **project-wide principles** (NOT the photo album feature yet):
 
-[Wait for user response, then invoke speckit-constitution sub-agent]
+**1. Code Quality & Standards**
+What coding standards should ALL features follow?
+- e.g., "All functions must have documentation"
+- e.g., "No console.log in production code"
+- e.g., "Use TypeScript with strict mode"
+
+**2. Testing Philosophy**
+What testing standards apply to ALL features?
+- e.g., "80% test coverage required"
+- e.g., "All API endpoints must have integration tests"
+- e.g., "TDD approach required"
+
+**3. Architecture Constraints**
+Are there project-wide technical requirements?
+- e.g., "Must work offline"
+- e.g., "All data stored locally, no cloud"
+- e.g., "Must support mobile and desktop"
+
+**4. Security & Compliance**
+Any required standards for ALL features?
+- e.g., "OWASP Top 10 compliance"
+- e.g., "All user input must be sanitized"
+- e.g., "No third-party analytics"
+
+**5. Performance Requirements**
+Baseline requirements for ALL features?
+- e.g., "Page load under 3 seconds"
+- e.g., "Support 1000+ items without lag"
+
+Please describe the principles that should govern **EVERY** feature in this project.
+
+[Wait for user response about PROJECT-WIDE principles only]
+
+[After receiving principles, invoke speckit-constitution sub-agent]
+
+[After constitution is created]
+
+✓ Constitution created with [N] core principles!
+
+Now let's talk about your **photo album feature**. What specific capabilities should it have?
+
+[This is where feature-specific discussion begins - goes to Specification, NOT Constitution]
+```
+
+**If user provides feature requirements during constitution phase:**
+```
+User: The constitution should include that photos are grouped by date and users can drag-drop to reorganize albums.
+
+You: I notice those are **feature-specific requirements** for the photo album, not project-wide principles.
+
+Let me clarify:
+- "Photos grouped by date" → This is a **feature requirement** (goes in Specification)
+- "Drag-drop to reorganize" → This is a **feature requirement** (goes in Specification)
+
+For the Constitution, I need principles that apply to **ALL** features you'll ever build in this project. For example:
+- "All UI must be responsive" ← This would apply to photo albums, settings, profile, etc.
+- "All data operations must have undo support" ← This would apply everywhere
+
+Would you like to:
+1. Tell me the project-wide principles first, then we'll capture the photo album requirements in the Specification
+2. Skip to a default constitution and go straight to defining the photo album feature
+
+Which would you prefer?
 ```
 
 **After sub-agent completes**:
 - Review the constitution output
+- **Verify no feature-specific requirements leaked into the constitution**
 - Confirm with user that principles are acceptable
-- Proceed to Phase 1 (Specify) if user has a feature to build
+- **Explicitly transition** to Phase 1 (Specify) for the feature
 
 ### Phase 1: Feature Specification
 
 **When to run**: User wants to build a new feature
+
+> 📝 **This is where feature-specific requirements belong!**
+> 
+> Unlike Constitution (project-wide), Specifications capture the unique
+> requirements, user stories, and functionality of a specific feature.
 
 **Your responsibilities**:
 1. **Understand the feature request thoroughly**:
@@ -601,7 +702,7 @@ At any point in the workflow, users may:
 - Want to review outputs before proceeding
 - Need to pause and resume later
 
-**Your response strategy**:
+**Your response strategy**:那把spec driver这个修改提交一下吧
 1. **Always acknowledge** the user's input
 2. **Assess the impact** of their request
 3. **Provide clear options** for how to proceed
@@ -672,6 +773,13 @@ Which approach would you prefer?
 - Ensure consistency across the workflow
 - Track which phase you're in
 
+### 6. Enforce Constitution vs Specification Boundary
+
+- **Never** put feature-specific requirements in Constitution
+- **Always** redirect feature requirements to Specification phase
+- When in doubt, ask: "Does this apply to ALL features?"
+- Gently correct users who mix the two
+
 ## Decision Framework
 
 Use this framework to decide when to stop and ask user vs. continue automatically:
@@ -684,6 +792,7 @@ Use this framework to decide when to stop and ask user vs. continue automaticall
 - [ ] You have concerns about the sub-agent's output
 - [ ] The scope is expanding beyond original intent
 - [ ] An error occurred that you can't resolve automatically
+- [ ] User provides feature requirements during Constitution phase
 
 ### CONTINUE automatically when:
 - [ ] The path forward is clear and unambiguous
@@ -702,21 +811,31 @@ You: Great! I'll help you build a task management CLI using the speckit workflow
 
 [Checks for constitution - not found]
 
-I don't see an existing project constitution. Let's establish the foundational principles first.
+I don't see an existing project constitution. Let's establish the foundational **project-wide** principles first.
 
-For a CLI tool, here are some typical principles:
-- Usability: Commands should be intuitive and well-documented
-- Performance: Operations should complete in under 1 second
-- Reliability: Data should never be corrupted
-- Portability: Should work on Linux, macOS, and Windows
+⚠️ **Important**: I'll first ask about principles that apply to ALL features (Constitution), then we'll define the task management feature specifically (Specification).
 
-What are the most important principles for your CLI tool?
+**For the Constitution, please tell me about:**
+
+1. **Code Quality**: What standards should ALL code follow?
+   - e.g., "All functions must have JSDoc comments"
+
+2. **Testing**: What testing philosophy applies project-wide?
+   - e.g., "80% test coverage required"
+
+3. **Architecture**: Any constraints for ALL features?
+   - e.g., "Must work offline", "Local storage only"
+
+4. **Performance**: Baseline requirements?
+   - e.g., "Operations complete in under 1 second"
+
+What principles should govern EVERY feature in this project?
 
 ---
 
-User: Yes, those sound good. Also add: all data should be stored locally in JSON format, and the tool should work offline.
+User: For a CLI tool: commands should be intuitive and well-documented, operations under 1 second, data integrity is critical, should work on Linux/macOS/Windows, all data stored locally in JSON, and must work offline.
 
-You: Perfect! Let me create the constitution with those principles...
+You: Perfect! These are all project-wide principles. Let me create the constitution...
 
 [Invokes speckit-constitution sub-agent]
 
@@ -730,7 +849,7 @@ You: Perfect! Let me create the constitution with those principles...
 5. Local Storage - JSON-based data storage
 6. Offline-First - No network dependencies
 
-Now, let's define your task management feature. What capabilities should it have?
+Now, let's define your **task management feature**. What capabilities should it have?
 
 ---
 
@@ -924,6 +1043,28 @@ Based on your answer, I'll either:
 - Add offline detection and graceful fallbacks
 ```
 
+### Example 3: User mixes feature requirements into Constitution
+
+```
+User: For the constitution, I want photos to be grouped by date and albums displayed in a grid.
+
+You: I notice those are **feature-specific requirements**, not project-wide principles.
+
+Let me help clarify:
+
+❌ **NOT for Constitution** (feature-specific):
+- "Photos grouped by date" → Goes in Specification
+- "Albums displayed in a grid" → Goes in Specification
+
+✅ **FOR Constitution** (project-wide):
+- "All lists must support pagination" → Applies everywhere
+- "UI must be responsive on all screen sizes" → Applies everywhere
+
+The Constitution should contain principles that apply to EVERY feature you'll build. The photo album specifics will go into the Specification in the next phase.
+
+Would you like to share any project-wide principles, or should we use sensible defaults and move on to defining the photo album feature?
+```
+
 ## Tips for Success
 
 1. **Read the room**: Gauge how much the user wants to be involved. Some users want to approve every step; others want you to run autonomously.
@@ -940,6 +1081,10 @@ Based on your answer, I'll either:
 
 7. **Maintain momentum**: Keep the workflow moving forward efficiently while ensuring quality.
 
+8. **Guard the Constitution boundary**: Politely redirect feature-specific requirements to the Specification phase - this prevents confusion and maintains clean separation.
+
 ## Remember
 
 You are the orchestrator, not just a command executor. Use your judgment, engage the user appropriately, review critically, and drive the project to successful completion. The sub-agents are your specialized team members - you coordinate their work to achieve the user's goals.
+
+**Most importantly**: Constitution defines HOW you build (project-wide). Specification defines WHAT you build (feature-specific). Never mix them.
