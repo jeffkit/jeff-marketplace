@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "keys": [
+    {
+      "id": "291f36ba-4e1b-4eeb-8fa2-ad5106f39056",
+      "projectId": "/Users/kongjie/projects/jeff-marketplace",
+      "keyHash": "$2a$10$J2wdJo07gq2ZxZdLxWAxm.j8bYO6XdB8jzZWSoiksURSQI.F8FJO.",
+      "encryptedKey": "d47008acdfdc3eb17b3b4ce5:a8682321d50b8c5fc2f96ab5576d5801:7904bdea29ca2e16b193a56a4720d7be17c77a70f239fc536efbad91d98100be5c6f01918307d902b8842014544e2f34647a",
+      "description": "用于从 ai-editor 调用",
+      "createdAt": "2026-01-06T06:13:00.847Z"
+    },
+    {
+      "id": "1167bdda-4e19-4b20-af32-b3ebcb524df5",
+      "projectId": "/Users/kongjie/projects/jeff-marketplace",
+      "keyHash": "$2a$10$vVXNQg5zrWapTBHFwLqpL.3bZaO.8P2eNR6vg4Zq4UYnGfYwzm1yC",
+      "encryptedKey": "7df495e2ed9eaad9ee11d64c:e66a1882c8a852000248127fb813b664:8fbebb62b072402e7fdcf488ab7cc90d774e9a16c8825dd3f6eeadaccd9395118354c3e98accced08724ec7a2ec8f4805633",
+      "description": "用于从 jarvis 调用",
+      "createdAt": "2026-01-07T03:52:15.855Z"
+    }
+  ]
+}
